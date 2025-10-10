@@ -9,8 +9,8 @@ WORKDIR /app
 # Копирование package.json и package-lock.json
 COPY package*.json ./
 
-# Установка зависимостей
-RUN npm ci --only=production && npm cache clean --force
+# Установка всех зависимостей (включая devDependencies для сборки)
+RUN npm ci && npm cache clean --force
 
 # Копирование исходного кода
 COPY . .
