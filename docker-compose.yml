@@ -14,9 +14,9 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-    # Если бэкенд работает на хосте (вне Docker), раскомментируйте:
-    # extra_hosts:
-    #   - "backend:host-gateway"
+    # Доступ к бэкенду на хосте (работает для контейнеров на одном сервере)
+    extra_hosts:
+      - "backend:host-gateway"
 
 networks:
   app-network:
