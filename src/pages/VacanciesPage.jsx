@@ -35,22 +35,6 @@ const VacanciesPage = () => {
     }
   };
 
-  const handleUpdateVacancies = async () => {
-    if (window.confirm('Обновить список вакансий из внешнего API?')) {
-      try {
-        setLoading(true);
-        await vacancyService.updateFromAPI();
-        alert('Вакансии успешно обновлены');
-        fetchData();
-      } catch (error) {
-        console.error('Error updating vacancies:', error);
-        alert('Ошибка при обновлении вакансий');
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   const handleView = (item) => {
     setSelectedItem(item);
     setModalMode('view');
@@ -186,12 +170,6 @@ const VacanciesPage = () => {
         <h2>Вакансии</h2>
         <button className="btn btn-add" onClick={handleAdd}>
           + Добавить
-        </button>
-      </div>
-
-      <div className="action-buttons">
-        <button className="btn btn-action" onClick={handleUpdateVacancies}>
-          🔄 Обновить
         </button>
       </div>
 

@@ -36,19 +36,6 @@ const TechnologiesPage = () => {
     }
   };
 
-  const handleUpdateByVacancies = async () => {
-    if (window.confirm('Обновить технологии по вакансиям?')) {
-      try {
-        await technologyService.updateByVacancies();
-        alert('Успешно обновлено');
-        fetchData();
-      } catch (error) {
-        console.error('Error updating by vacancies:', error);
-        alert('Ошибка при обновлении');
-      }
-    }
-  };
-
   const handleMatchToKeywords = async () => {
     if (window.confirm('Соотнести технологии с ключевыми словами?')) {
       try {
@@ -211,9 +198,6 @@ const TechnologiesPage = () => {
       </div>
 
       <div className="action-buttons">
-        <button className="btn btn-action" onClick={handleUpdateByVacancies}>
-          🔄 Обновить по вакансиям
-        </button>
         <button className="btn btn-action" onClick={handleMatchToKeywords}>
           🔗 Соотнести с ключевыми словами
         </button>

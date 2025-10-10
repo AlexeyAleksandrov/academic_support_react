@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # Frontend React приложение
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: academic-support-frontend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    # Если бэкенд работает на хосте (вне Docker), раскомментируйте:
+    # extra_hosts:
+    #   - "backend:host-gateway"
+
+networks:
+  app-network:
+    driver: bridge

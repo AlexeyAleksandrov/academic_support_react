@@ -22,16 +22,15 @@ export const rpdService = {
 
 // Competencies (Компетенции)
 export const competencyService = {
-  getAll: () => api.get('/api/competency'),
-  getById: (id) => api.get(`/api/competency/${id}`),
-  create: (data) => api.post('/api/competency', data),
-  update: (id, data) => api.put(`/api/competency/${id}`, data),
-  delete: (id) => api.delete(`/api/competency/${id}`),
+  getAll: () => api.get('/api/competencies'),
+  getById: (id) => api.get(`/api/competencies/${id}`),
+  create: (data) => api.post('/api/competencies', data),
+  update: (id, data) => api.put(`/api/competencies/${id}`, data),
+  delete: (id) => api.delete(`/api/competencies/${id}`),
 };
 
 // Indicators (Индикаторы)
 export const indicatorService = {
-  getAll: () => api.get('/api/indicators'),
   getByCompetency: (competencyNumber) => api.get(`/api/competencies/${competencyNumber}/indicators`),
   getByNumber: (competencyNumber, number) => api.get(`/api/competencies/${competencyNumber}/indicators/number/${number}`),
   create: (competencyNumber, data) => api.post(`/api/competencies/${competencyNumber}/indicators`, data),
@@ -46,9 +45,9 @@ export const technologyService = {
   create: (data) => api.post('/api/work-skills', data),
   update: (id, data) => api.put(`/api/work-skills/${id}`, data),
   delete: (id) => api.delete(`/api/work-skills/${id}`),
-  updateByVacancies: () => api.get('/api/update/workSkillsMarketDemand'),
-  matchToKeywords: () => api.get('/api/work-skills/math-to-keywords'),
-  updateMarketDemand: () => api.get('/api/work-skills/update-market-demand'),
+  matchToKeywords: () => api.get('/work-skills/math-to-keywords'),
+  updateMarketDemand: () => api.get('/work-skills/update-market-demand'),
+  matchToGroups: () => api.post('/api/work-skills/match-to-groups'),
 };
 
 // Technology Groups / Skills Groups (Группы технологий)
@@ -58,28 +57,32 @@ export const techGroupService = {
   create: (data) => api.post('/api/skills-groups', data),
   update: (id, data) => api.put(`/api/skills-groups/${id}`, data),
   delete: (id) => api.delete(`/api/skills-groups/${id}`),
-  matchToTechnologies: () => api.get('/api/skills-groups/math-to-work-skills'),
-  updateMarketDemand: () => api.get('/api/skills-groups/update-market-demand'),
+  matchToTechnologies: () => api.get('/skills-groups/math-to-work-skills'),
+  updateMarketDemand: () => api.get('/skills-groups/update-market-demand'),
 };
 
-// Keywords (Ключевые слова)
+// Keywords (Ключевые слова) - работают через competencies
 export const keywordService = {
-  getAll: () => api.get('/api/keywords'),
-  getById: (id) => api.get(`/api/keywords/${id}`),
-  create: (data) => api.post('/api/keywords', data),
-  update: (id, data) => api.put(`/api/keywords/${id}`, data),
-  delete: (id) => api.delete(`/api/keywords/${id}`),
-  matchAll: () => api.post('/api/keywords/match/all'),
+  // Создание ключевых слов для индикатора компетенции
+  createForIndicator: (competencyNumber, indicatorNumber, data) => 
+    api.post(`/api/competencies/${competencyNumber}/indicators/${indicatorNumber}/keywords`, data),
+  // Генерация ключевых слов для компетенции
+  generateForCompetency: (competencyId) => 
+    api.post(`/api/competencies/${competencyId}/keywords/generate`),
 };
 
 // Vacancies (Вакансии)
 export const vacancyService = {
-  getAll: () => api.get('/api/vac/list'),
-  getById: (id) => api.get(`/api/vac/${id}`),
-  create: (data) => api.post('/api/vac', data),
-  update: (id, data) => api.put(`/api/vac/${id}`, data),
-  delete: (id) => api.delete(`/api/vac/${id}`),
-  updateFromAPI: () => api.get('/api/vac/list/save'),
+  getAll: () => api.get('/api/vacancies'),
+  getById: (id) => api.get(`/api/vacancies/${id}`),
+  create: (data) => api.post('/api/vacancies', data),
+  update: (id, data) => api.put(`/api/vacancies/${id}`, data),
+  delete: (id) => api.delete(`/api/vacancies/${id}`),
+  getCount: () => api.get('/api/vacancies/count'),
+  getByHhId: (hhId) => api.get(`/api/vacancies/hh/${hhId}`),
+  getSkills: (id) => api.get(`/api/vacancies/${id}/skills`),
+  addSkill: (id, data) => api.post(`/api/vacancies/${id}/skills`, data),
+  removeSkill: (id, skillId) => api.delete(`/api/vacancies/${id}/skills/${skillId}`),
 };
 
 // Experts (Эксперты)

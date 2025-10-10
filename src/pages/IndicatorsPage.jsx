@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import { indicatorService } from '../services/api';
+import { indicatorService, competencyService } from '../services/api';
 import './PageStyles.css';
 
 const IndicatorsPage = () => {
   const [data, setData] = useState([]);
+  const [competencies, setCompetencies] = useState([]);
+  const [selectedCompetency, setSelectedCompetency] = useState('');
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
@@ -20,13 +22,38 @@ const IndicatorsPage = () => {
   ];
 
   useEffect(() => {
-    fetchData();
+    fetchCompetencies();
   }, []);
 
+  useEffect(() => {
+    if (selectedCompetency) {
+      fetchData();
+    }
+  }, [selectedCompetency]);
+
+  const fetchCompetencies = async () => {
+    try {
+      const response = await competencyService.getAll();
+      setCompetencies(response.data || []);
+      if (response.data && response.data.length > 0) {
+        setSelectedCompetency(response.data[0].number);
+      }
+    } catch (error) {
+      console.error('Error fetching competencies:', error);
+      alert('Ошибка при загрузке компетенций');
+    }
+  };
+
   const fetchData = async () => {
+    if (!selectedCompetency) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await indicatorService.getAll();
+      const response = await indicatorService.getByCompetency(selectedCompetency);
       setData(response.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -51,7 +78,7 @@ const IndicatorsPage = () => {
 
   const handleAdd = () => {
     setSelectedItem(null);
-    setFormData({});
+    setFormData({ competencyNumber: selectedCompetency });
     setModalMode('add');
     setModalOpen(true);
   };
@@ -73,7 +100,7 @@ const IndicatorsPage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'add') {
-        await indicatorService.create(formData.competencyNumber, formData);
+        await indicatorService.create(formData.competencyNumber || selectedCompetency, formData);
         alert('Успешно добавлено');
       } else if (modalMode === 'edit') {
         await indicatorService.update(selectedItem.competencyNumber, selectedItem.number, formData);
@@ -207,10 +234,26 @@ const IndicatorsPage = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h2>Индикаторы</h2>
-        <button className="btn btn-add" onClick={handleAdd}>
-          + Добавить
-        </button>
+        <h1>Индикаторы достижения компетенций</h1>
+        <div className="header-controls">
+          <div className="competency-filter">
+            <label htmlFor="competency-select">Компетенция: </label>
+            <select 
+              id="competency-select"
+              value={selectedCompetency} 
+              onChange={(e) => setSelectedCompetency(e.target.value)}
+              className="competency-select"
+            >
+              <option value="">Выберите компетенцию</option>
+              {competencies.map(comp => (
+                <option key={comp.id} value={comp.number}>
+                  {comp.number} - {comp.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button onClick={handleAdd} className="add-button">Добавить</button>
+        </div>
       </div>
 
       <DataTable
