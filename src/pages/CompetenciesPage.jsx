@@ -264,25 +264,49 @@ const CompetenciesPage = () => {
     );
   };
 
+  const handleGenerateAllKeywords = async () => {
+    if (data.length === 0) {
+      alert('Нет компетенций для генерации ключевых слов');
+      return;
+    }
+    
+    if (window.confirm('Сгенерировать ключевые слова с помощью ИИ для всех компетенций?')) {
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const comp of data) {
+        try {
+          await keywordService.generateForCompetency(comp.id);
+          successCount++;
+        } catch (error) {
+          console.error(`Error generating keywords for competency ${comp.number}:`, error);
+          errorCount++;
+        }
+      }
+      
+      if (errorCount === 0) {
+        alert(`Успешно сгенерированы ключевые слова для ${successCount} компетенций`);
+      } else {
+        alert(`Готово: ${successCount} успешно, ${errorCount} с ошибками`);
+      }
+      
+      fetchData();
+    }
+  };
+
   return (
     <div className="page-container">
       <div className="page-header">
         <h2>Компетенции</h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-action" onClick={() => {
-            const selectedComp = data[0];
-            if (selectedComp) {
-              handleGenerateKeywords(selectedComp.id);
-            } else {
-              alert('Нет компетенций для генерации ключевых слов');
-            }
-          }}>
-            🤖 Выделить ключевые слова с помощью ИИ
-          </button>
-          <button className="btn btn-add" onClick={handleAdd}>
-            + Добавить
-          </button>
-        </div>
+        <button className="btn btn-add" onClick={handleAdd}>
+          + Добавить
+        </button>
+      </div>
+
+      <div className="action-buttons">
+        <button className="btn btn-action" onClick={handleGenerateAllKeywords}>
+          🤖 Выделить ключевые слова с помощью ИИ
+        </button>
       </div>
 
       <DataTable
