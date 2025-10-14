@@ -227,7 +227,7 @@ const IndicatorsPage = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Индикаторы достижения компетенций</h1>
+        <h2>Индикаторы достижения компетенций</h2>
         <button onClick={handleAdd} className="btn btn-add">+ Добавить</button>
       </div>
 
@@ -243,15 +243,17 @@ const IndicatorsPage = () => {
             
             return (
               <div key={comp.number} style={{ marginBottom: '30px' }}>
-                <h3 style={{ 
+                <div style={{ 
                   backgroundColor: '#f5f5f5', 
-                  padding: '15px', 
+                  padding: '12px 15px', 
                   borderRadius: '8px',
                   marginBottom: '15px',
-                  color: '#2c3e50'
+                  color: '#2c3e50',
+                  fontSize: '1rem',
+                  fontWeight: '600'
                 }}>
                   Компетенция {comp.number}: {comp.description}
-                </h3>
+                </div>
                 <div className="table-container">
                   <table className="data-table">
                     <thead>
