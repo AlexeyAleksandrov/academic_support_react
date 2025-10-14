@@ -26,7 +26,7 @@ const DataTable = ({ columns, data, onView, onEdit, onDelete, loading }) => {
             <tr key={row.id || rowIndex}>
               {columns.map((column, colIndex) => (
                 <td key={colIndex}>
-                  {column.render ? column.render(row) : row[column.field]}
+                  {column.render ? column.render(row, rowIndex) : row[column.field]}
                 </td>
               ))}
               <td className="actions-cell">
