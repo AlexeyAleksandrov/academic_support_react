@@ -45,8 +45,8 @@ export const technologyService = {
   create: (data) => api.post('/api/work-skills', data),
   update: (id, data) => api.put(`/api/work-skills/${id}`, data),
   delete: (id) => api.delete(`/api/work-skills/${id}`),
-  matchToKeywords: () => api.get('/work-skills/math-to-keywords'),
-  updateMarketDemand: () => api.get('/work-skills/update-market-demand'),
+  matchToKeywords: () => api.post('/api/keywords/match/all'),
+  updateMarketDemand: () => api.get('/update/workSkillsMarketDemand'),
   matchToGroups: () => api.post('/api/work-skills/match-to-groups'),
 };
 
@@ -57,18 +57,26 @@ export const techGroupService = {
   create: (data) => api.post('/api/skills-groups', data),
   update: (id, data) => api.put(`/api/skills-groups/${id}`, data),
   delete: (id) => api.delete(`/api/skills-groups/${id}`),
-  matchToTechnologies: () => api.get('/skills-groups/math-to-work-skills'),
-  updateMarketDemand: () => api.get('/skills-groups/update-market-demand'),
+  matchToTechnologies: () => api.post('/api/skills-groups/match-to-work-skills'),
+  updateMarketDemand: () => api.put('/api/skills-groups/update-market-demand'),
+  getWorkSkills: (id) => api.get(`/api/skills-groups/${id}/work-skills`),
 };
 
-// Keywords (Ключевые слова) - работают через competencies
+// Keywords (Ключевые слова)
 export const keywordService = {
+  getAll: () => api.get('/api/keywords'),
+  getById: (id) => api.get(`/api/keywords/${id}`),
+  create: (data) => api.post('/api/keywords', data),
+  update: (id, data) => api.put(`/api/keywords/${id}`, data),
+  delete: (id) => api.delete(`/api/keywords/${id}`),
   // Создание ключевых слов для индикатора компетенции
   createForIndicator: (competencyNumber, indicatorNumber, data) => 
     api.post(`/api/competencies/${competencyNumber}/indicators/${indicatorNumber}/keywords`, data),
   // Генерация ключевых слов для компетенции
   generateForCompetency: (competencyId) => 
     api.post(`/api/competencies/${competencyId}/keywords/generate`),
+  // Соотнести все ключевые слова с технологиями
+  matchAll: () => api.post('/api/keywords/match/all'),
 };
 
 // Vacancies (Вакансии)

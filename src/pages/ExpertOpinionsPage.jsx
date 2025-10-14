@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import { expertOpinionService } from '../services/api';
+import { expertOpinionService, expertService, technologyService } from '../services/api';
 import './PageStyles.css';
 
 const ExpertOpinionsPage = () => {
@@ -11,18 +11,63 @@ const ExpertOpinionsPage = () => {
   const [modalMode, setModalMode] = useState('view');
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
+  const [experts, setExperts] = useState([]);
+  const [workSkills, setWorkSkills] = useState([]);
+  const [expertsMap, setExpertsMap] = useState({});
+  const [skillsMap, setSkillsMap] = useState({});
+
+  const formatPercent = (value) => {
+    if (!value || value === 0) return '0%';
+    const percent = value * 100;
+    return percent.toFixed(2) + '%';
+  };
 
   const columns = [
-    { header: 'ID', field: 'id' },
-    { header: 'Эксперт', field: 'expertName' },
-    { header: 'Тема', field: 'topic' },
-    { header: 'Оценка', field: 'rating' },
-    { header: 'Дата', field: 'date' },
+    { header: 'Эксперт', field: 'expertId', render: (row) => expertsMap[row.expertId] || `ID: ${row.expertId}` },
+    { header: 'Индикатор', field: 'competencyAchievementIndicatorId' },
+    { header: 'Навык', field: 'workSkillId', render: (row) => skillsMap[row.workSkillId] || `ID: ${row.workSkillId}` },
+    { header: 'Важность', field: 'skillImportance', render: (row) => formatPercent(row.skillImportance) },
   ];
 
   useEffect(() => {
-    fetchData();
+    fetchAllData();
   }, []);
+
+  const fetchAllData = async () => {
+    await fetchExperts();
+    await fetchWorkSkills();
+    await fetchData();
+  };
+
+  const fetchExperts = async () => {
+    try {
+      const response = await expertService.getAll();
+      const exp = response.data || [];
+      setExperts(exp);
+      const map = {};
+      exp.forEach(e => {
+        map[e.id] = e.name;
+      });
+      setExpertsMap(map);
+    } catch (error) {
+      console.error('Error fetching experts:', error);
+    }
+  };
+
+  const fetchWorkSkills = async () => {
+    try {
+      const response = await technologyService.getAll();
+      const skills = response.data || [];
+      setWorkSkills(skills);
+      const map = {};
+      skills.forEach(s => {
+        map[s.id] = s.description;
+      });
+      setSkillsMap(map);
+    } catch (error) {
+      console.error('Error fetching work skills:', error);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -45,14 +90,24 @@ const ExpertOpinionsPage = () => {
 
   const handleEdit = (item) => {
     setSelectedItem(item);
-    setFormData(item);
+    setFormData({
+      expertId: item.expertId || '',
+      competencyAchievementIndicatorId: item.competencyAchievementIndicatorId || '',
+      workSkillId: item.workSkillId || '',
+      skillImportance: item.skillImportance ? (item.skillImportance * 100).toFixed(2) : '0',
+    });
     setModalMode('edit');
     setModalOpen(true);
   };
 
   const handleAdd = () => {
     setSelectedItem(null);
-    setFormData({});
+    setFormData({
+      expertId: '',
+      competencyAchievementIndicatorId: '',
+      workSkillId: '',
+      skillImportance: '0',
+    });
     setModalMode('add');
     setModalOpen(true);
   };
@@ -73,18 +128,25 @@ const ExpertOpinionsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        expertId: parseInt(formData.expertId),
+        competencyAchievementIndicatorId: parseInt(formData.competencyAchievementIndicatorId),
+        workSkillId: parseInt(formData.workSkillId),
+        skillImportance: parseFloat(formData.skillImportance) / 100,
+      };
+      
       if (modalMode === 'add') {
-        await expertOpinionService.create(formData);
+        await expertOpinionService.create(payload);
         alert('Успешно добавлено');
       } else if (modalMode === 'edit') {
-        await expertOpinionService.update(selectedItem.id, formData);
+        await expertOpinionService.update(selectedItem.id, payload);
         alert('Успешно обновлено');
       }
       setModalOpen(false);
       fetchData();
     } catch (error) {
       console.error('Error saving data:', error);
-      alert('Ошибка при сохранении');
+      alert('Ошибка при сохранении: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -103,27 +165,19 @@ const ExpertOpinionsPage = () => {
           </div>
           <div className="view-field">
             <label>Эксперт:</label>
-            <span>{selectedItem?.expertName}</span>
+            <span>{expertsMap[selectedItem?.expertId] || `ID: ${selectedItem?.expertId}`}</span>
           </div>
           <div className="view-field">
-            <label>Тема:</label>
-            <span>{selectedItem?.topic}</span>
+            <label>Индикатор:</label>
+            <span>{selectedItem?.competencyAchievementIndicatorId}</span>
           </div>
           <div className="view-field">
-            <label>Мнение:</label>
-            <span>{selectedItem?.opinion}</span>
+            <label>Навык:</label>
+            <span>{skillsMap[selectedItem?.workSkillId] || `ID: ${selectedItem?.workSkillId}`}</span>
           </div>
           <div className="view-field">
-            <label>Оценка:</label>
-            <span>{selectedItem?.rating}</span>
-          </div>
-          <div className="view-field">
-            <label>Дата:</label>
-            <span>{selectedItem?.date}</span>
-          </div>
-          <div className="view-field">
-            <label>Комментарий:</label>
-            <span>{selectedItem?.comment}</span>
+            <label>Важность:</label>
+            <span>{formatPercent(selectedItem?.skillImportance)}</span>
           </div>
         </div>
       );
@@ -132,68 +186,62 @@ const ExpertOpinionsPage = () => {
     return (
       <form onSubmit={handleSubmit} className="form-content">
         <div className="form-group">
-          <label htmlFor="expertId">ID эксперта:</label>
-          <input
-            type="number"
+          <label htmlFor="expertId">Эксперт:</label>
+          <select
             id="expertId"
             name="expertId"
             value={formData.expertId || ''}
             onChange={handleInputChange}
             required
-          />
+          >
+            <option value="">Выберите эксперта</option>
+            {experts.map(exp => (
+              <option key={exp.id} value={exp.id}>
+                {exp.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="form-group">
-          <label htmlFor="topic">Тема:</label>
-          <input
-            type="text"
-            id="topic"
-            name="topic"
-            value={formData.topic || ''}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="opinion">Мнение:</label>
-          <textarea
-            id="opinion"
-            name="opinion"
-            value={formData.opinion || ''}
-            onChange={handleInputChange}
-            rows="4"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="rating">Оценка (1-10):</label>
+          <label htmlFor="competencyAchievementIndicatorId">ID индикатора:</label>
           <input
             type="number"
-            id="rating"
-            name="rating"
-            min="1"
-            max="10"
-            value={formData.rating || ''}
+            id="competencyAchievementIndicatorId"
+            name="competencyAchievementIndicatorId"
+            value={formData.competencyAchievementIndicatorId || ''}
             onChange={handleInputChange}
+            required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="date">Дата:</label>
+          <label htmlFor="workSkillId">Навык:</label>
+          <select
+            id="workSkillId"
+            name="workSkillId"
+            value={formData.workSkillId || ''}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">Выберите навык</option>
+            {workSkills.map(skill => (
+              <option key={skill.id} value={skill.id}>
+                {skill.description}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="skillImportance">Важность (%):</label>
           <input
-            type="date"
-            id="date"
-            name="date"
-            value={formData.date || ''}
+            type="number"
+            step="0.01"
+            id="skillImportance"
+            name="skillImportance"
+            value={formData.skillImportance || '0'}
             onChange={handleInputChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="comment">Комментарий:</label>
-          <textarea
-            id="comment"
-            name="comment"
-            value={formData.comment || ''}
-            onChange={handleInputChange}
-            rows="3"
+            required
+            min="0"
+            max="100"
           />
         </div>
         <div className="form-actions">

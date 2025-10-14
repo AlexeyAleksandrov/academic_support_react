@@ -12,11 +12,16 @@ const ExpertsPage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
 
+  const formatPercent = (value) => {
+    if (!value || value === 0) return '0%';
+    const percent = value * 100;
+    return percent.toFixed(2) + '%';
+  };
+
   const columns = [
-    { header: 'ID', field: 'id' },
-    { header: 'ФИО', field: 'fullName' },
-    { header: 'Email', field: 'email' },
-    { header: 'Организация', field: 'organization' },
+    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
+    { header: 'Название', field: 'name' },
+    { header: 'Доверие', field: 'trust', render: (row) => formatPercent(row.trust) },
   ];
 
   useEffect(() => {
@@ -44,20 +49,23 @@ const ExpertsPage = () => {
 
   const handleEdit = (item) => {
     setSelectedItem(item);
-    setFormData(item);
+    setFormData({
+      name: item.name || '',
+      trust: item.trust ? (item.trust * 100).toFixed(2) : '0',
+    });
     setModalMode('edit');
     setModalOpen(true);
   };
 
   const handleAdd = () => {
     setSelectedItem(null);
-    setFormData({});
+    setFormData({ name: '', trust: '0' });
     setModalMode('add');
     setModalOpen(true);
   };
 
   const handleDelete = async (item) => {
-    if (window.confirm(`Вы уверены, что хотите удалить эксперта "${item.fullName}"?`)) {
+    if (window.confirm(`Вы уверены, что хотите удалить эксперта "${item.name}"?`)) {
       try {
         await expertService.delete(item.id);
         alert('Успешно удалено');
@@ -72,18 +80,23 @@ const ExpertsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        name: formData.name,
+        trust: parseFloat(formData.trust) / 100, // Преобразовать проценты в десятичное число
+      };
+      
       if (modalMode === 'add') {
-        await expertService.create(formData);
+        await expertService.create(payload);
         alert('Успешно добавлено');
       } else if (modalMode === 'edit') {
-        await expertService.update(selectedItem.id, formData);
+        await expertService.update(selectedItem.id, payload);
         alert('Успешно обновлено');
       }
       setModalOpen(false);
       fetchData();
     } catch (error) {
       console.error('Error saving data:', error);
-      alert('Ошибка при сохранении');
+      alert('Ошибка при сохранении: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -101,24 +114,12 @@ const ExpertsPage = () => {
             <span>{selectedItem?.id}</span>
           </div>
           <div className="view-field">
-            <label>ФИО:</label>
-            <span>{selectedItem?.fullName}</span>
+            <label>Название:</label>
+            <span>{selectedItem?.name}</span>
           </div>
           <div className="view-field">
-            <label>Email:</label>
-            <span>{selectedItem?.email}</span>
-          </div>
-          <div className="view-field">
-            <label>Организация:</label>
-            <span>{selectedItem?.organization}</span>
-          </div>
-          <div className="view-field">
-            <label>Должность:</label>
-            <span>{selectedItem?.position}</span>
-          </div>
-          <div className="view-field">
-            <label>Специализация:</label>
-            <span>{selectedItem?.specialization}</span>
+            <label>Доверие:</label>
+            <span>{formatPercent(selectedItem?.trust)}</span>
           </div>
         </div>
       );
@@ -127,55 +128,28 @@ const ExpertsPage = () => {
     return (
       <form onSubmit={handleSubmit} className="form-content">
         <div className="form-group">
-          <label htmlFor="fullName">ФИО:</label>
+          <label htmlFor="name">Название:</label>
           <input
             type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName || ''}
+            id="name"
+            name="name"
+            value={formData.name || ''}
             onChange={handleInputChange}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email:</label>
+          <label htmlFor="trust">Доверие (%):</label>
           <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email || ''}
+            type="number"
+            step="0.01"
+            id="trust"
+            name="trust"
+            value={formData.trust || '0'}
             onChange={handleInputChange}
             required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="organization">Организация:</label>
-          <input
-            type="text"
-            id="organization"
-            name="organization"
-            value={formData.organization || ''}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="position">Должность:</label>
-          <input
-            type="text"
-            id="position"
-            name="position"
-            value={formData.position || ''}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="specialization">Специализация:</label>
-          <input
-            type="text"
-            id="specialization"
-            name="specialization"
-            value={formData.specialization || ''}
-            onChange={handleInputChange}
+            min="0"
+            max="100"
           />
         </div>
         <div className="form-actions">

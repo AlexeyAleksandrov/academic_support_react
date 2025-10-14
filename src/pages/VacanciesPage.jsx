@@ -12,10 +12,30 @@ const VacanciesPage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
 
+  const formatDate = (timestamp) => {
+    if (!timestamp) return '-';
+    const date = new Date(timestamp);
+    // +3 часа для московского времени
+    date.setHours(date.getHours() + 3);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
+  };
+
+  const stripHtml = (html) => {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   const columns = [
-    { header: 'ID', field: 'id' },
+    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
     { header: 'Название', field: 'name' },
-    { header: 'Дата публикации', field: 'publishedAt' },
+    { header: 'Дата публикации', field: 'publishedAt', render: (row) => formatDate(row.publishedAt) },
   ];
 
   useEffect(() => {
@@ -43,7 +63,16 @@ const VacanciesPage = () => {
 
   const handleEdit = (item) => {
     setSelectedItem(item);
-    setFormData(item);
+    // Преобразовать timestamp в формат datetime-local
+    let publishedAtFormatted = '';
+    if (item.publishedAt) {
+      const date = new Date(item.publishedAt);
+      publishedAtFormatted = date.toISOString().slice(0, 16);
+    }
+    setFormData({
+      ...item,
+      publishedAt: publishedAtFormatted,
+    });
     setModalMode('edit');
     setModalOpen(true);
   };
@@ -105,15 +134,25 @@ const VacanciesPage = () => {
           </div>
           <div className="view-field">
             <label>Дата публикации:</label>
-            <span>{selectedItem?.publishedAt}</span>
+            <span>{formatDate(selectedItem?.publishedAt)}</span>
           </div>
-          <div className="view-field">
-            <label>Описание:</label>
-            <span>{selectedItem?.description}</span>
+          <div className="view-field" style={{ display: 'block' }}>
+            <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>Описание:</label>
+            <span>{stripHtml(selectedItem?.description)}</span>
           </div>
-          <div className="view-field">
-            <label>Навыки:</label>
-            <span>{selectedItem?.skills?.join(', ') || 'Нет'}</span>
+          <div className="view-field" style={{ display: 'block', marginTop: '15px' }}>
+            <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>Навыки:</label>
+            {selectedItem?.skills && selectedItem.skills.length > 0 ? (
+              <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
+                {selectedItem.skills.map((skill, index) => (
+                  <li key={index} style={{ marginBottom: '5px' }}>
+                    {skill.description || skill}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span>Нет</span>
+            )}
           </div>
         </div>
       );
@@ -133,9 +172,9 @@ const VacanciesPage = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="publishedAt">Дата публикации:</label>
+          <label htmlFor="publishedAt">Дата и время публикации:</label>
           <input
-            type="date"
+            type="datetime-local"
             id="publishedAt"
             name="publishedAt"
             value={formData.publishedAt || ''}

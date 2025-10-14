@@ -11,11 +11,19 @@ const TechGroupsPage = () => {
   const [modalMode, setModalMode] = useState('view');
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
+  const [groupWorkSkills, setGroupWorkSkills] = useState([]);
+
+  const formatPercent = (value) => {
+    if (!value || value === 0) return '0%';
+    const percent = value * 100;
+    if (percent < 0.1) return '<0.1%';
+    return percent.toFixed(2) + '%';
+  };
 
   const columns = [
-    { header: 'ID', field: 'id' },
+    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
     { header: 'Описание', field: 'description' },
-    { header: 'Востребованность', field: 'marketDemand', render: (row) => row.marketDemand?.toFixed(2) || '0' },
+    { header: 'Востребованность', field: 'marketDemand', render: (row) => formatPercent(row.marketDemand) },
   ];
 
   useEffect(() => {
@@ -61,8 +69,18 @@ const TechGroupsPage = () => {
     }
   };
 
-  const handleView = (item) => {
+  const handleView = async (item) => {
     setSelectedItem(item);
+    
+    // Загрузить технологии для этой группы
+    try {
+      const response = await techGroupService.getWorkSkills(item.id);
+      setGroupWorkSkills(response.data || []);
+    } catch (error) {
+      console.error('Error fetching work skills:', error);
+      setGroupWorkSkills([]);
+    }
+    
     setModalMode('view');
     setModalOpen(true);
   };
@@ -131,7 +149,21 @@ const TechGroupsPage = () => {
           </div>
           <div className="view-field">
             <label>Востребованность:</label>
-            <span>{selectedItem?.marketDemand?.toFixed(2) || '0'}</span>
+            <span>{formatPercent(selectedItem?.marketDemand)}</span>
+          </div>
+          <div className="view-field" style={{ display: 'block', marginTop: '20px' }}>
+            <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>Технологии в этой группе:</label>
+            {groupWorkSkills.length > 0 ? (
+              <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
+                {groupWorkSkills.map(skill => (
+                  <li key={skill.id} style={{ marginBottom: '8px' }}>
+                    {skill.description}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span>Нет технологий</span>
+            )}
           </div>
         </div>
       );
@@ -157,7 +189,7 @@ const TechGroupsPage = () => {
             step="0.01"
             id="marketDemand"
             name="marketDemand"
-            value={formData.marketDemand || ''}
+            value={formData.marketDemand !== undefined && formData.marketDemand !== null ? formData.marketDemand : '0'}
             onChange={handleInputChange}
           />
         </div>

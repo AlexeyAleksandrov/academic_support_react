@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import { technologyService } from '../services/api';
+import { technologyService, techGroupService } from '../services/api';
 import './PageStyles.css';
 
 const TechnologiesPage = () => {
@@ -11,15 +11,25 @@ const TechnologiesPage = () => {
   const [modalMode, setModalMode] = useState('view');
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
+  const [skillsGroups, setSkillsGroups] = useState([]);
+  const [groupsMap, setGroupsMap] = useState({});
+
+  const formatPercent = (value) => {
+    if (!value || value === 0) return '0%';
+    const percent = value * 100;
+    if (percent < 0.1) return '<0.1%';
+    return percent.toFixed(2) + '%';
+  };
 
   const columns = [
-    { header: 'ID', field: 'id' },
+    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
     { header: 'Описание', field: 'description' },
-    { header: 'Востребованность', field: 'marketDemand', render: (row) => row.marketDemand?.toFixed(2) || '0' },
-    { header: 'Группа', field: 'skillsGroupId', render: (row) => row.skillsGroupBySkillsGroupId?.description || '-' },
+    { header: 'Востребованность', field: 'marketDemand', render: (row) => formatPercent(row.marketDemand) },
+    { header: 'Группа', field: 'skillsGroupId', render: (row) => groupsMap[row.skillsGroupId] || '-' },
   ];
 
   useEffect(() => {
+    fetchSkillsGroups();
     fetchData();
   }, []);
 
@@ -33,6 +43,21 @@ const TechnologiesPage = () => {
       alert('Ошибка при загрузке данных');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSkillsGroups = async () => {
+    try {
+      const response = await techGroupService.getAll();
+      const groups = response.data || [];
+      setSkillsGroups(groups);
+      const map = {};
+      groups.forEach(g => {
+        map[g.id] = g.description;
+      });
+      setGroupsMap(map);
+    } catch (error) {
+      console.error('Error fetching skills groups:', error);
     }
   };
 
@@ -68,7 +93,7 @@ const TechnologiesPage = () => {
     setModalOpen(true);
   };
 
-  const handleEdit = (item) => {
+  const handleEdit = async (item) => {
     setSelectedItem(item);
     setFormData(item);
     setModalMode('edit');
@@ -132,11 +157,11 @@ const TechnologiesPage = () => {
           </div>
           <div className="view-field">
             <label>Востребованность:</label>
-            <span>{selectedItem?.marketDemand?.toFixed(2) || '0'}</span>
+            <span>{formatPercent(selectedItem?.marketDemand)}</span>
           </div>
           <div className="view-field">
             <label>Группа технологий:</label>
-            <span>{selectedItem?.skillsGroupBySkillsGroupId?.description || '-'}</span>
+            <span>{groupsMap[selectedItem?.skillsGroupId] || '-'}</span>
           </div>
         </div>
       );
@@ -167,14 +192,20 @@ const TechnologiesPage = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="skillsGroupId">ID группы технологий:</label>
-          <input
-            type="number"
+          <label htmlFor="skillsGroupId">Группа технологий:</label>
+          <select
             id="skillsGroupId"
             name="skillsGroupId"
             value={formData.skillsGroupId || ''}
             onChange={handleInputChange}
-          />
+          >
+            <option value="">Не выбрана</option>
+            {skillsGroups.map(g => (
+              <option key={g.id} value={g.id}>
+                {g.description}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">

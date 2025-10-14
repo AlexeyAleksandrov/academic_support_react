@@ -5,56 +5,37 @@ import { indicatorService, competencyService } from '../services/api';
 import './PageStyles.css';
 
 const IndicatorsPage = () => {
-  const [data, setData] = useState([]);
+  const [allIndicators, setAllIndicators] = useState([]);
   const [competencies, setCompetencies] = useState([]);
-  const [selectedCompetency, setSelectedCompetency] = useState('');
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('view');
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
 
-  const columns = [
-    { header: 'ID', field: 'id' },
-    { header: 'Номер', field: 'number' },
-    { header: 'Описание', field: 'description', render: (row) => row.description?.substring(0, 60) || '' },
-    { header: 'Компетенция', field: 'competencyNumber' },
-  ];
-
   useEffect(() => {
-    fetchCompetencies();
+    fetchAllData();
   }, []);
 
-  useEffect(() => {
-    if (selectedCompetency) {
-      fetchData();
-    }
-  }, [selectedCompetency]);
-
-  const fetchCompetencies = async () => {
-    try {
-      const response = await competencyService.getAll();
-      setCompetencies(response.data || []);
-      if (response.data && response.data.length > 0) {
-        setSelectedCompetency(response.data[0].number);
-      }
-    } catch (error) {
-      console.error('Error fetching competencies:', error);
-      alert('Ошибка при загрузке компетенций');
-    }
-  };
-
-  const fetchData = async () => {
-    if (!selectedCompetency) {
-      setData([]);
-      setLoading(false);
-      return;
-    }
-
+  const fetchAllData = async () => {
     try {
       setLoading(true);
-      const response = await indicatorService.getByCompetency(selectedCompetency);
-      setData(response.data || []);
+      const compResponse = await competencyService.getAll();
+      const comps = compResponse.data || [];
+      setCompetencies(comps);
+      
+      // Загрузить все индикаторы для всех компетенций
+      const allInds = [];
+      for (const comp of comps) {
+        try {
+          const indResp = await indicatorService.getByCompetency(comp.number);
+          const indicators = indResp.data || [];
+          allInds.push(...indicators);
+        } catch (err) {
+          console.error(`Error loading indicators for ${comp.number}:`, err);
+        }
+      }
+      setAllIndicators(allInds);
     } catch (error) {
       console.error('Error fetching data:', error);
       alert('Ошибка при загрузке данных');
@@ -78,7 +59,7 @@ const IndicatorsPage = () => {
 
   const handleAdd = () => {
     setSelectedItem(null);
-    setFormData({ competencyNumber: selectedCompetency });
+    setFormData({ competencyNumber: competencies.length > 0 ? competencies[0].number : '' });
     setModalMode('add');
     setModalOpen(true);
   };
@@ -88,7 +69,7 @@ const IndicatorsPage = () => {
       try {
         await indicatorService.delete(item.competencyNumber, item.number);
         alert('Успешно удалено');
-        fetchData();
+        fetchAllData();
       } catch (error) {
         console.error('Error deleting item:', error);
         alert('Ошибка при удалении');
@@ -100,14 +81,14 @@ const IndicatorsPage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'add') {
-        await indicatorService.create(formData.competencyNumber || selectedCompetency, formData);
+        await indicatorService.create(formData.competencyNumber, formData);
         alert('Успешно добавлено');
       } else if (modalMode === 'edit') {
         await indicatorService.update(selectedItem.competencyNumber, selectedItem.number, formData);
         alert('Успешно обновлено');
       }
       setModalOpen(false);
-      fetchData();
+      fetchAllData();
     } catch (error) {
       console.error('Error saving data:', error);
       alert('Ошибка при сохранении');
@@ -124,11 +105,11 @@ const IndicatorsPage = () => {
       return (
         <div className="view-content">
           <div className="view-field">
-            <label>ID:</label>
-            <span>{selectedItem?.id}</span>
+            <label>Номер компетенции:</label>
+            <span>{selectedItem?.competencyNumber}</span>
           </div>
           <div className="view-field">
-            <label>Номер:</label>
+            <label>Номер индикатора:</label>
             <span>{selectedItem?.number}</span>
           </div>
           <div className="view-field">
@@ -147,10 +128,6 @@ const IndicatorsPage = () => {
             <label>Владеть:</label>
             <span>{selectedItem?.indicatorPossess}</span>
           </div>
-          <div className="view-field">
-            <label>Номер компетенции:</label>
-            <span>{selectedItem?.competencyNumber}</span>
-          </div>
         </div>
       );
     }
@@ -159,14 +136,20 @@ const IndicatorsPage = () => {
       <form onSubmit={handleSubmit} className="form-content">
         <div className="form-group">
           <label htmlFor="competencyNumber">Номер компетенции:</label>
-          <input
-            type="text"
+          <select
             id="competencyNumber"
             name="competencyNumber"
             value={formData.competencyNumber || ''}
             onChange={handleInputChange}
             required
-          />
+          >
+            <option value="">Выберите компетенцию</option>
+            {competencies.map(comp => (
+              <option key={comp.id} value={comp.number}>
+                {comp.number} - {comp.description}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="form-group">
           <label htmlFor="number">Номер индикатора:</label>
@@ -231,39 +214,91 @@ const IndicatorsPage = () => {
     );
   };
 
+  // Группировка индикаторов по компетенциям
+  const groupedIndicators = allIndicators.reduce((acc, ind) => {
+    const compNum = ind.competencyNumber;
+    if (!acc[compNum]) {
+      acc[compNum] = [];
+    }
+    acc[compNum].push(ind);
+    return acc;
+  }, {});
+
   return (
     <div className="page-container">
       <div className="page-header">
         <h1>Индикаторы достижения компетенций</h1>
-        <div className="header-controls">
-          <div className="competency-filter">
-            <label htmlFor="competency-select">Компетенция: </label>
-            <select 
-              id="competency-select"
-              value={selectedCompetency} 
-              onChange={(e) => setSelectedCompetency(e.target.value)}
-              className="competency-select"
-            >
-              <option value="">Выберите компетенцию</option>
-              {competencies.map(comp => (
-                <option key={comp.id} value={comp.number}>
-                  {comp.number} - {comp.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button onClick={handleAdd} className="add-button">Добавить</button>
-        </div>
+        <button onClick={handleAdd} className="btn btn-add">+ Добавить</button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={data}
-        loading={loading}
-        onView={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {loading ? (
+        <div className="loading">Загрузка данных...</div>
+      ) : allIndicators.length === 0 ? (
+        <div className="no-data">Нет данных для отображения</div>
+      ) : (
+        <div>
+          {competencies.map(comp => {
+            const indicators = groupedIndicators[comp.number] || [];
+            if (indicators.length === 0) return null;
+            
+            return (
+              <div key={comp.number} style={{ marginBottom: '30px' }}>
+                <h3 style={{ 
+                  backgroundColor: '#f5f5f5', 
+                  padding: '15px', 
+                  borderRadius: '8px',
+                  marginBottom: '15px',
+                  color: '#2c3e50'
+                }}>
+                  Компетенция {comp.number}: {comp.description}
+                </h3>
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Номер</th>
+                        <th>Описание</th>
+                        <th className="actions-column">Действия</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {indicators.map((ind) => (
+                        <tr key={ind.id}>
+                          <td>{ind.number}</td>
+                          <td>{ind.description?.substring(0, 100) || ''}</td>
+                          <td className="actions-cell">
+                            <button
+                              className="action-btn view-btn"
+                              onClick={() => handleView(ind)}
+                              title="Просмотр"
+                            >
+                              👁️
+                            </button>
+                            <button
+                              className="action-btn edit-btn"
+                              onClick={() => handleEdit(ind)}
+                              title="Редактировать"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              className="action-btn delete-btn"
+                              onClick={() => handleDelete(ind)}
+                              title="Удалить"
+                            >
+                              🗑️
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <Modal
         isOpen={modalOpen}
