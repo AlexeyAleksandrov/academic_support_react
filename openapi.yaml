@@ -6,50 +6,76 @@ info:
 servers:
   - url: "https://JAcademicSupport"
 paths:
-  /work-skills/math-to-keywords:
+  /update/workSkillsMarketDemand:
     get:
-      summary: "GET work-skills/math-to-keywords"
-      operationId: "showMatchToSkillsGroups"
+      summary: "GET update/workSkillsMarketDemand"
+      operationId: "updateWorkSkillsMarketDemand"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "string"
-  /work-skills/update-market-demand:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkill"
+  /vac/by-saved-searches:
     get:
-      summary: "GET work-skills/update-market-demand"
-      operationId: "showUpdateMarketDemand"
+      summary: "GET vac/by-saved-searches"
+      operationId: "getVacanciesBySavedSearches"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "string"
-  /skills-groups/math-to-work-skills:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/VacancyEntity"
+  /vac/list:
     get:
-      summary: "GET skills-groups/math-to-work-skills"
-      operationId: "showMatchToSkillsGroups"
+      summary: "GET vac/list"
+      operationId: "vacanciesList"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "string"
-  /skills-groups/update-market-demand:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/VacancyItem"
+  /vac/list/save:
     get:
-      summary: "GET skills-groups/update-market-demand"
-      operationId: "showUpdateMarketDemand"
+      summary: "GET vac/list/save"
+      operationId: "getAndSaveAllVacancies"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "string"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/VacancyEntity"
+  /vac/{id}:
+    get:
+      summary: "GET vac/{id}"
+      operationId: "vacanciesList"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Vacancy"
   /api/saved-searches:
     get:
       summary: "GET api/saved-searches"
@@ -557,6 +583,106 @@ paths:
             '*/*':
               schema:
                 type: "string"
+  /api/keywords:
+    get:
+      summary: "GET api/keywords"
+      operationId: "getAllKeywords"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/KeywordDto"
+    post:
+      summary: "POST api/keywords"
+      operationId: "createKeyword"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateKeywordRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KeywordDto"
+  /api/keywords/match/all:
+    post:
+      summary: "POST api/keywords/match/all"
+      operationId: "matchKeywordsToWorkSkills"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Keyword"
+  /api/keywords/{id}:
+    get:
+      summary: "GET api/keywords/{id}"
+      operationId: "getKeywordById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KeywordDto"
+    put:
+      summary: "PUT api/keywords/{id}"
+      operationId: "updateKeyword"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateKeywordRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KeywordDto"
+    delete:
+      summary: "DELETE api/keywords/{id}"
+      operationId: "deleteKeyword"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
   /api/vacancies:
     get:
       summary: "GET api/vacancies"
@@ -785,6 +911,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SkillsGroup"
+  /api/skills-groups/match-to-work-skills:
+    post:
+      summary: "POST api/skills-groups/match-to-work-skills"
+      operationId: "matchSkillsToGroups"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkill"
+  /api/skills-groups/update-market-demand:
+    put:
+      summary: "PUT api/skills-groups/update-market-demand"
+      operationId: "updateSkillsGroupsMarketDemand"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SkillsGroup"
   /api/skills-groups/{id}:
     get:
       summary: "GET api/skills-groups/{id}"
@@ -1047,7 +1199,9 @@ paths:
           content:
             '*/*':
               schema:
-                type: "object"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkillResponseDto"
     post:
       summary: "POST api/work-skills"
       operationId: "createWorkSkill"
@@ -1063,7 +1217,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: "object"
+                $ref: "#/components/schemas/WorkSkillResponseDto"
   /api/work-skills/match-to-groups:
     post:
       summary: "POST api/work-skills/match-to-groups"
@@ -1074,7 +1228,9 @@ paths:
           content:
             '*/*':
               schema:
-                type: "object"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkillResponseDto"
   /api/work-skills/{id}:
     get:
       summary: "GET api/work-skills/{id}"
@@ -1092,7 +1248,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: "object"
+                $ref: "#/components/schemas/WorkSkillResponseDto"
     put:
       summary: "PUT api/work-skills/{id}"
       operationId: "updateWorkSkill"
@@ -1115,7 +1271,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: "object"
+                $ref: "#/components/schemas/WorkSkillResponseDto"
     delete:
       summary: "DELETE api/work-skills/{id}"
       operationId: "deleteWorkSkill"
@@ -1132,7 +1288,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: "object"
+                $ref: "#/components/schemas/WorkSkillResponseDto"
   /api/work-skills/{workSkillId}/skills-group/{skillsGroupId}:
     put:
       summary: "PUT api/work-skills/{workSkillId}/skills-group/{skillsGroupId}"
@@ -1156,7 +1312,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: "object"
+                $ref: "#/components/schemas/WorkSkillResponseDto"
   /api/foresights:
     get:
       summary: "GET api/foresights"
@@ -1411,6 +1567,96 @@ paths:
                 $ref: "#/components/schemas/DstAggregationResponseDto"
 components:
   schemas:
+    SkillsGroup:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        marketDemand:
+          type: "number"
+          format: "double"
+          nullable: true
+    WorkSkill:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        marketDemand:
+          type: "number"
+          format: "double"
+          nullable: true
+        skillsGroupBySkillsGroupId:
+          nullable: true
+          $ref: "#/components/schemas/SkillsGroup"
+    VacancyEntity:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        hhId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        name:
+          type: "string"
+          nullable: true
+        publishedAt:
+          type: "string"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        skills:
+          type: "array"
+          nullable: true
+          items:
+            $ref: "#/components/schemas/WorkSkill"
+    VacancyItem:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        name:
+          type: "string"
+          nullable: true
+        publishedAt:
+          type: "string"
+          nullable: true
+    Vacancy:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        name:
+          type: "string"
+          nullable: true
+        publishedAt:
+          type: "string"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        skills:
+          type: "array"
+          nullable: true
+          items:
+            type: "string"
     SavedSearch:
       type: "object"
       properties:
@@ -1527,37 +1773,12 @@ components:
         description:
           type: "string"
           nullable: true
-    SkillsGroup:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
+        keywordIds:
+          type: "array"
           nullable: true
-        description:
-          type: "string"
-          nullable: true
-        marketDemand:
-          type: "number"
-          format: "double"
-          nullable: true
-    WorkSkill:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        description:
-          type: "string"
-          nullable: true
-        marketDemand:
-          type: "number"
-          format: "double"
-          nullable: true
-        skillsGroupBySkillsGroupId:
-          nullable: true
-          $ref: "#/components/schemas/SkillsGroup"
+          items:
+            type: "integer"
+            format: "int64"
     Keyword:
       type: "object"
       properties:
@@ -1719,31 +1940,46 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/RecommendedSkillDto"
-    VacancyEntity:
+    KeywordDto:
       type: "object"
       properties:
         id:
           type: "integer"
           format: "int64"
           nullable: true
-        hhId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        name:
+        keyword:
           type: "string"
           nullable: true
-        publishedAt:
-          type: "string"
-          nullable: true
-        description:
-          type: "string"
-          nullable: true
-        skills:
+        workSkillIds:
           type: "array"
           nullable: true
           items:
-            $ref: "#/components/schemas/WorkSkill"
+            type: "integer"
+            format: "int64"
+    CreateKeywordRequest:
+      type: "object"
+      properties:
+        keyword:
+          type: "string"
+          nullable: true
+        workSkillIds:
+          type: "array"
+          nullable: true
+          items:
+            type: "integer"
+            format: "int64"
+    UpdateKeywordRequest:
+      type: "object"
+      properties:
+        keyword:
+          type: "string"
+          nullable: true
+        workSkillIds:
+          type: "array"
+          nullable: true
+          items:
+            type: "integer"
+            format: "int64"
     VacancyDto:
       type: "object"
       properties:
@@ -1828,6 +2064,24 @@ components:
         skillImportance:
           type: "number"
           format: "double"
+          nullable: true
+    WorkSkillResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        marketDemand:
+          type: "number"
+          format: "double"
+          nullable: true
+        skillsGroupId:
+          type: "integer"
+          format: "int64"
           nullable: true
     WorkSkillDto:
       type: "object"
