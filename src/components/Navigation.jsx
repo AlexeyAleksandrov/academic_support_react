@@ -4,6 +4,7 @@ import './Navigation.css';
 
 const Navigation = () => {
   const navItems = [
+    { path: '/', label: 'Главная' },
     { path: '/rpd', label: 'РПД' },
     { path: '/competencies', label: 'Компетенции' },
     { path: '/indicators', label: 'Индикаторы' },
@@ -22,6 +23,7 @@ const Navigation = () => {
           <li key={item.path} className="nav-item">
             <NavLink
               to={item.path}
+              end={item.path === '/'}
               className={({ isActive }) =>
                 isActive ? 'nav-link active' : 'nav-link'
               }
