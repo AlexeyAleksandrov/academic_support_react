@@ -37,10 +37,17 @@ const CompetenciesPage = () => {
     }
   };
 
-  const handleView = (item) => {
-    setSelectedItem(item);
-    setModalMode('view');
-    setModalOpen(true);
+  const handleView = async (item) => {
+    try {
+      // Получить полную информацию о компетенции с ключевыми словами
+      const response = await competencyService.getById(item.id);
+      setSelectedItem(response.data);
+      setModalMode('view');
+      setModalOpen(true);
+    } catch (error) {
+      console.error('Error loading competency details:', error);
+      alert('Ошибка при загрузке данных компетенции');
+    }
   };
 
   const handleEdit = async (item) => {
