@@ -81,7 +81,7 @@ export const keywordService = {
 
 // Vacancies (Вакансии)
 export const vacancyService = {
-  getAll: () => api.get('/api/vacancies'),
+  getAll: (offset = 0, limit = 50) => api.get('/api/vacancies', { params: { offset, limit } }),
   getById: (id) => api.get(`/api/vacancies/${id}`),
   create: (data) => api.post('/api/vacancies', data),
   update: (id, data) => api.put(`/api/vacancies/${id}`, data),

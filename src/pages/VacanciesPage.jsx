@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import Pagination from '../components/Pagination';
 import { vacancyService } from '../services/api';
 import './PageStyles.css';
 
@@ -11,6 +12,9 @@ const VacanciesPage = () => {
   const [modalMode, setModalMode] = useState('view');
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const itemsPerPage = 50;
 
   const formatDate = (timestamp) => {
     if (!timestamp) return '-';
@@ -40,12 +44,23 @@ const VacanciesPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    fetchTotalCount();
+  }, [currentPage]);
+
+  const fetchTotalCount = async () => {
+    try {
+      const response = await vacancyService.getCount();
+      setTotalCount(response.data || 0);
+    } catch (error) {
+      console.error('Error fetching total count:', error);
+    }
+  };
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await vacancyService.getAll();
+      const offset = (currentPage - 1) * itemsPerPage;
+      const response = await vacancyService.getAll(offset, itemsPerPage);
       setData(response.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -226,6 +241,13 @@ const VacanciesPage = () => {
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
+      />
+
+      <Pagination
+        currentPage={currentPage}
+        totalCount={totalCount}
+        itemsPerPage={itemsPerPage}
+        onPageChange={(pageNumber) => setCurrentPage(pageNumber)}
       />
 
       <Modal
