@@ -55,10 +55,17 @@ const VacanciesPage = () => {
     }
   };
 
-  const handleView = (item) => {
-    setSelectedItem(item);
-    setModalMode('view');
-    setModalOpen(true);
+  const handleView = async (item) => {
+    try {
+      // Получить полную информацию о вакансии с навыками по hhId
+      const response = await vacancyService.getByHhId(item.hhId);
+      setSelectedItem(response.data);
+      setModalMode('view');
+      setModalOpen(true);
+    } catch (error) {
+      console.error('Error loading vacancy details:', error);
+      alert('Ошибка при загрузке данных вакансии');
+    }
   };
 
   const handleEdit = (item) => {
