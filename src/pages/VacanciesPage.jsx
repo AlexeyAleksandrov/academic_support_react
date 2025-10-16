@@ -37,7 +37,7 @@ const VacanciesPage = () => {
   };
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
+    { header: '№', field: 'rowNumber', render: (row, index) => (currentPage - 1) * itemsPerPage + index + 1 },
     { header: 'Название', field: 'name' },
     { header: 'Дата публикации', field: 'publishedAt', render: (row) => formatDate(row.publishedAt) },
   ];
