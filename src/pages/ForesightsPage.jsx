@@ -15,11 +15,12 @@ const ForesightsPage = () => {
 
   const columns = [
     { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
+    { header: 'Навык', field: 'workSkillId', render: (row) => getWorkSkillName(row.workSkillId) },
     { header: 'Источник', field: 'sourceName' },
-    { header: 'URL источника', field: 'sourceUrl', render: (row) => row.sourceUrl?.substring(0, 50) || '' },
   ];
 
   useEffect(() => {
+    fetchAllWorkSkills();
     fetchData();
   }, []);
 
@@ -48,7 +49,7 @@ const ForesightsPage = () => {
 
   const getWorkSkillName = (workSkillId) => {
     const skill = allWorkSkills.find(s => s.id === workSkillId);
-    return skill ? skill.name : `ID: ${workSkillId}`;
+    return skill ? skill.description : `ID: ${workSkillId}`;
   };
 
   const handleView = async (item) => {
@@ -171,7 +172,7 @@ const ForesightsPage = () => {
               <option value="">Выберите навык</option>
               {allWorkSkills.map(skill => (
                 <option key={skill.id} value={skill.id}>
-                  {skill.name}
+                  {skill.description}
                 </option>
               ))}
             </select>
