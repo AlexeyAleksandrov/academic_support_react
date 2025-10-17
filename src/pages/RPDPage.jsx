@@ -23,13 +23,6 @@ const RPDPage = () => {
     { header: 'Год', field: 'year' },
   ];
 
-  const customActions = [
-    {
-      label: 'Управление навыками',
-      handler: handleManageSkills,
-    },
-  ];
-
   useEffect(() => {
     fetchData();
     fetchCompetencies();

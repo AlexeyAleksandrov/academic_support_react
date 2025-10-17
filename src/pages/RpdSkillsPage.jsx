@@ -34,9 +34,11 @@ const RpdSkillsPage = () => {
   ];
 
   useEffect(() => {
-    fetchRpdInfo();
-    fetchWorkSkills();
-    fetchData();
+    if (rpdId) {
+      fetchRpdInfo();
+      fetchWorkSkills();
+      fetchData();
+    }
   }, [rpdId]);
 
   const fetchRpdInfo = async () => {
@@ -45,6 +47,7 @@ const RpdSkillsPage = () => {
       setRpdInfo(response.data);
     } catch (error) {
       console.error('Error fetching RPD info:', error);
+      // Не блокируем работу страницы, если не удалось загрузить информацию об РПД
     }
   };
 
@@ -55,7 +58,7 @@ const RpdSkillsPage = () => {
       setData(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching RPD skills:', error);
-      alert('Ошибка при загрузке данных: ' + error.message);
+      setData([]); // Устанавливаем пустой массив в случае ошибки
     } finally {
       setLoading(false);
     }
@@ -67,6 +70,7 @@ const RpdSkillsPage = () => {
       setWorkSkills(response.data || []);
     } catch (error) {
       console.error('Error fetching work skills:', error);
+      setWorkSkills([]); // Устанавливаем пустой массив в случае ошибки
     }
   };
 
