@@ -55,7 +55,18 @@ const RpdSkillsPage = () => {
     try {
       setLoading(true);
       const response = await rpdSkillService.getByRpdId(rpdId);
-      setData(Array.isArray(response.data) ? response.data : []);
+      console.log('RPD Skills API response:', response.data);
+      
+      // Фильтруем null и undefined элементы и проверяем, что это массив
+      const rawData = response.data;
+      if (Array.isArray(rawData)) {
+        const filteredData = rawData.filter(item => item !== null && item !== undefined);
+        console.log('Filtered RPD Skills data:', filteredData);
+        setData(filteredData);
+      } else {
+        console.warn('RPD Skills response is not an array:', rawData);
+        setData([]);
+      }
     } catch (error) {
       console.error('Error fetching RPD skills:', error);
       setData([]); // Устанавливаем пустой массив в случае ошибки
@@ -147,6 +158,10 @@ const RpdSkillsPage = () => {
 
   const renderModalContent = () => {
     if (modalMode === 'view') {
+      if (!selectedItem) {
+        return <div className="no-data">Нет данных для отображения</div>;
+      }
+      
       const skill = workSkills.find(s => s.id === selectedItem.workSkillId);
       return (
         <div className="view-content">

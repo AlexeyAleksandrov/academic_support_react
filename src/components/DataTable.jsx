@@ -10,6 +10,13 @@ const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customAct
     return <div className="no-data">Нет данных для отображения</div>;
   }
 
+  // Фильтруем null и undefined элементы
+  const validData = data.filter(item => item !== null && item !== undefined);
+
+  if (validData.length === 0) {
+    return <div className="no-data">Нет данных для отображения</div>;
+  }
+
   return (
     <div className="table-container">
       <table className="data-table">
@@ -22,7 +29,7 @@ const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customAct
           </tr>
         </thead>
         <tbody>
-          {data.map((row, rowIndex) => (
+          {validData.map((row, rowIndex) => (
             <tr key={row.id || rowIndex}>
               {columns.map((column, colIndex) => (
                 <td key={colIndex}>
