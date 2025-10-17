@@ -149,7 +149,15 @@ const ForesightsPage = () => {
           </div>
           <div className="view-field">
             <strong>URL источника:</strong>
-            <span>{selectedItem.sourceUrl}</span>
+            <span>
+              {selectedItem.sourceUrl ? (
+                <a href={selectedItem.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  {selectedItem.sourceUrl}
+                </a>
+              ) : (
+                'Не указан'
+              )}
+            </span>
           </div>
         </div>
       );
