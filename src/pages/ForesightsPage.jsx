@@ -15,8 +15,8 @@ const ForesightsPage = () => {
 
   const columns = [
     { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Навык', field: 'workSkillId', render: (row) => getWorkSkillName(row.workSkillId) },
     { header: 'Источник', field: 'sourceName' },
+    { header: 'Навык', field: 'workSkillId', render: (row) => getWorkSkillName(row.workSkillId) },
   ];
 
   useEffect(() => {
