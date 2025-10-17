@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import { technologyService, techGroupService } from '../services/api';
+import { technologyService, techGroupService, dstAggregationService } from '../services/api';
 import './PageStyles.css';
 
 const TechnologiesPage = () => {
@@ -13,6 +13,9 @@ const TechnologiesPage = () => {
   const [formData, setFormData] = useState({});
   const [skillsGroups, setSkillsGroups] = useState([]);
   const [groupsMap, setGroupsMap] = useState({});
+  const [dstModalOpen, setDstModalOpen] = useState(false);
+  const [dstData, setDstData] = useState(null);
+  const [loadingDst, setLoadingDst] = useState(false);
 
   const formatPercent = (value) => {
     if (!value || value === 0) return '0%';
@@ -120,6 +123,22 @@ const TechnologiesPage = () => {
     }
   };
 
+  const handleShowDstAggregation = async (item) => {
+    try {
+      setLoadingDst(true);
+      setDstModalOpen(true);
+      setDstData(null);
+      const response = await dstAggregationService.getByWorkSkillId(item.id);
+      setDstData(response.data);
+    } catch (error) {
+      console.error('Error fetching DST aggregation:', error);
+      alert('Ошибка при загрузке DST-аггрегации: ' + (error.response?.data?.message || error.message));
+      setDstModalOpen(false);
+    } finally {
+      setLoadingDst(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -219,6 +238,42 @@ const TechnologiesPage = () => {
     );
   };
 
+  const renderDstModalContent = () => {
+    if (loadingDst) {
+      return <div className="loading">Загрузка DST-аггрегации...</div>;
+    }
+
+    if (!dstData) {
+      return <div className="no-data">Нет данных для отображения</div>;
+    }
+
+    const formatDstPercent = (value) => {
+      if (value === null || value === undefined) return 'Нет данных';
+      return `${(value).toFixed(2)}%`;
+    };
+
+    return (
+      <div className="view-content">
+        <div className="view-field">
+          <label>Процент часов в РПД:</label>
+          <span>{formatDstPercent(dstData.rpdCoveragePercentage)}</span>
+        </div>
+        <div className="view-field">
+          <label>Востребованность на рынке:</label>
+          <span>{formatDstPercent(dstData.marketDemand)}</span>
+        </div>
+        <div className="view-field">
+          <label>Оценка востребованности экспертами:</label>
+          <span>{formatDstPercent(dstData.expertOpinionPercentage)}</span>
+        </div>
+        <div className="view-field">
+          <label>Доля прогнозов:</label>
+          <span>{formatDstPercent(dstData.foresightPercentage)}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -241,6 +296,14 @@ const TechnologiesPage = () => {
         columns={columns}
         data={data}
         loading={loading}
+        customActions={[
+          {
+            icon: '📈',
+            title: 'DST-аггрегация',
+            onClick: handleShowDstAggregation,
+            className: 'dst-aggregation-btn'
+          }
+        ]}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -258,6 +321,14 @@ const TechnologiesPage = () => {
         }
       >
         {renderModalContent()}
+      </Modal>
+
+      <Modal
+        isOpen={dstModalOpen}
+        onClose={() => setDstModalOpen(false)}
+        title="DST-аггрегация технологии"
+      >
+        {renderDstModalContent()}
       </Modal>
     </div>
   );

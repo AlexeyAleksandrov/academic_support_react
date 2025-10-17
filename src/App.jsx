@@ -4,6 +4,7 @@ import Header from './components/Header.jsx';
 import Navigation from './components/Navigation.jsx';
 import HomePage from './pages/HomePage.jsx';
 import RPDPage from './pages/RPDPage.jsx';
+import RpdSkillsPage from './pages/RpdSkillsPage.jsx';
 import CompetenciesPage from './pages/CompetenciesPage.jsx';
 import IndicatorsPage from './pages/IndicatorsPage.jsx';
 import TechnologiesPage from './pages/TechnologiesPage.jsx';
@@ -26,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/rpd" element={<RPDPage />} />
+            <Route path="/rpd/:rpdId/skills" element={<RpdSkillsPage />} />
             <Route path="/competencies" element={<CompetenciesPage />} />
             <Route path="/indicators" element={<IndicatorsPage />} />
             <Route path="/technologies" element={<TechnologiesPage />} />

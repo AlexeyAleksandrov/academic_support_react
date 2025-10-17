@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import { rpdService, competencyService, indicatorService } from '../services/api';
 import './PageStyles.css';
 
 const RPDPage = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -19,6 +21,13 @@ const RPDPage = () => {
     { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
     { header: 'Название', field: 'disciplineName' },
     { header: 'Год', field: 'year' },
+  ];
+
+  const customActions = [
+    {
+      label: 'Управление навыками',
+      handler: handleManageSkills,
+    },
   ];
 
   useEffect(() => {
@@ -132,6 +141,10 @@ const RPDPage = () => {
         alert('Ошибка при удалении');
       }
     }
+  };
+
+  const handleManageSkills = (item) => {
+    navigate(`/rpd/${item.id}/skills`);
   };
 
   const handleSubmit = async (e) => {
@@ -337,6 +350,14 @@ const RPDPage = () => {
         columns={columns}
         data={data}
         loading={loading}
+        customActions={[
+          {
+            icon: '🎯',
+            title: 'Управление навыками',
+            onClick: handleManageSkills,
+            className: 'manage-skills-btn'
+          }
+        ]}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}

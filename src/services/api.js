@@ -129,4 +129,21 @@ export const foresightService = {
   delete: (id) => api.delete(`/api/foresights/${id}`),
 };
 
+// RPD Skills (Навыки в РПД)
+export const rpdSkillService = {
+  getAll: () => api.get('/api/rpd-skills'),
+  getById: (id) => api.get(`/api/rpd-skills/${id}`),
+  getByRpdId: (rpdId) => api.get(`/api/rpd-skills/rpd/${rpdId}`),
+  getByWorkSkillId: (workSkillId) => api.get(`/api/rpd-skills/work-skill/${workSkillId}`),
+  getByMinTime: (minTime) => api.get(`/api/rpd-skills/time/${minTime}`),
+  create: (data) => api.post('/api/rpd-skills', data),
+  update: (id, data) => api.put(`/api/rpd-skills/${id}`, data),
+  delete: (id) => api.delete(`/api/rpd-skills/${id}`),
+};
+
+// DST Aggregation (DST Аггрегация)
+export const dstAggregationService = {
+  getByWorkSkillId: (workSkillId) => api.get(`/api/dst-aggregation/${workSkillId}`),
+};
+
 export default api;

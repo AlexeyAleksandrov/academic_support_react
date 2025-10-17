@@ -1,7 +1,7 @@
 import React from 'react';
 import './DataTable.css';
 
-const DataTable = ({ columns, data, onView, onEdit, onDelete, loading }) => {
+const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customActions }) => {
   if (loading) {
     return <div className="loading">Загрузка данных...</div>;
   }
@@ -30,6 +30,16 @@ const DataTable = ({ columns, data, onView, onEdit, onDelete, loading }) => {
                 </td>
               ))}
               <td className="actions-cell">
+                {customActions && customActions.map((action, actionIndex) => (
+                  <button
+                    key={actionIndex}
+                    className={`action-btn ${action.className || ''}`}
+                    onClick={() => action.onClick(row)}
+                    title={action.title}
+                  >
+                    {action.icon}
+                  </button>
+                ))}
                 <button
                   className="action-btn view-btn"
                   onClick={() => onView(row)}
