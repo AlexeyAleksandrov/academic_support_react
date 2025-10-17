@@ -111,4 +111,22 @@ export const expertOpinionService = {
   delete: (id) => api.delete(`/api/expert-opinions/${id}`),
 };
 
+// Saved Searches (Сохранённые поисковые запросы Head Hunter)
+export const savedSearchService = {
+  getAll: () => api.get('/api/saved-searches'),
+  getById: (id) => api.get(`/api/saved-searches/${id}`),
+  create: (data) => api.post('/api/saved-searches', data),
+  update: (id, data) => api.put(`/api/saved-searches/${id}`, data),
+  delete: (id) => api.delete(`/api/saved-searches/${id}`),
+};
+
+// Foresights (Прогнозы)
+export const foresightService = {
+  getAll: () => api.get('/api/foresights'),
+  getById: (id) => api.get(`/api/foresights/${id}`),
+  create: (data) => api.post('/api/foresights', data),
+  update: (id, data) => api.put(`/api/foresights/${id}`, data),
+  delete: (id) => api.delete(`/api/foresights/${id}`),
+};
+
 export default api;

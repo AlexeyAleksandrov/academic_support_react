@@ -12,6 +12,8 @@ const Navigation = () => {
     { path: '/tech-groups', label: 'Группы технологий' },
     { path: '/keywords', label: 'Ключевые слова' },
     { path: '/vacancies', label: 'Вакансии' },
+    { path: '/saved-searches', label: 'Head Hunter' },
+    { path: '/foresights', label: 'Прогнозы' },
     { path: '/experts', label: 'Эксперты' },
     { path: '/expert-opinions', label: 'Мнения экспертов' },
   ];

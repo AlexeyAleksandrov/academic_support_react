@@ -12,6 +12,8 @@ import KeywordsPage from './pages/KeywordsPage.jsx';
 import VacanciesPage from './pages/VacanciesPage.jsx';
 import ExpertsPage from './pages/ExpertsPage.jsx';
 import ExpertOpinionsPage from './pages/ExpertOpinionsPage.jsx';
+import SavedSearchesPage from './pages/SavedSearchesPage.jsx';
+import ForesightsPage from './pages/ForesightsPage.jsx';
 import './App.css';
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
             <Route path="/vacancies" element={<VacanciesPage />} />
             <Route path="/experts" element={<ExpertsPage />} />
             <Route path="/expert-opinions" element={<ExpertOpinionsPage />} />
+            <Route path="/saved-searches" element={<SavedSearchesPage />} />
+            <Route path="/foresights" element={<ForesightsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
