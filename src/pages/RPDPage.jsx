@@ -76,29 +76,37 @@ const RPDPage = () => {
   };
 
   const handleEdit = async (item) => {
-    setSelectedItem(item);
-    setFormData({
-      disciplineName: item.disciplineName || '',
-      year: item.year || new Date().getFullYear(),
-    });
-    
-    // Загрузить компетенции и индикаторы
-    await fetchCompetencies();
-    
-    // Установить выбранные индикаторы
-    const selected = {};
-    if (item.competencyAchievementIndicators) {
-      item.competencyAchievementIndicators.forEach(ind => {
-        if (!selected[ind.competencyNumber]) {
-          selected[ind.competencyNumber] = [];
-        }
-        selected[ind.competencyNumber].push(ind.id);
+    try {
+      // Загрузить детальную информацию об РПД
+      const response = await rpdService.getById(item.id);
+      const rpdDetails = response.data;
+      
+      setSelectedItem(rpdDetails);
+      setFormData({
+        disciplineName: rpdDetails.disciplineName || '',
+        year: rpdDetails.year || new Date().getFullYear(),
       });
+      
+      // Загрузить компетенции и индикаторы
+      await fetchCompetencies();
+      
+      // Установить выбранные индикаторы из новой структуры данных
+      const selected = {};
+      if (rpdDetails.competencies && rpdDetails.competencies.length > 0) {
+        rpdDetails.competencies.forEach(competency => {
+          if (competency.indicators && competency.indicators.length > 0) {
+            selected[competency.number] = competency.indicators.map(ind => ind.id);
+          }
+        });
+      }
+      setSelectedIndicators(selected);
+      
+      setModalMode('edit');
+      setModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching RPD details for edit:', error);
+      alert('Ошибка при загрузке данных РПД для редактирования');
     }
-    setSelectedIndicators(selected);
-    
-    setModalMode('edit');
-    setModalOpen(true);
   };
 
   const handleAdd = async () => {
