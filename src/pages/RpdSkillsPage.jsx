@@ -55,16 +55,13 @@ const RpdSkillsPage = () => {
     try {
       setLoading(true);
       const response = await rpdSkillService.getByRpdId(rpdId);
-      console.log('RPD Skills API response:', response.data);
       
       // Фильтруем null и undefined элементы и проверяем, что это массив
       const rawData = response.data;
       if (Array.isArray(rawData)) {
         const filteredData = rawData.filter(item => item !== null && item !== undefined);
-        console.log('Filtered RPD Skills data:', filteredData);
         setData(filteredData);
       } else {
-        console.warn('RPD Skills response is not an array:', rawData);
         setData([]);
       }
     } catch (error) {
