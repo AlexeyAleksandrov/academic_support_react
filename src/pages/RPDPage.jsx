@@ -63,32 +63,16 @@ const RPDPage = () => {
   };
 
   const handleView = async (item) => {
-    // Загрузить информацию о компетенциях для индикаторов
-    if (item.competencyAchievementIndicators && item.competencyAchievementIndicators.length > 0) {
-      // Получить уникальные номера компетенций
-      const uniqueCompNumbers = [...new Set(item.competencyAchievementIndicators.map(ind => ind.competencyNumber))];
-      
-      // Найти описания компетенций
-      const compDescriptions = {};
-      for (const compNum of uniqueCompNumbers) {
-        const comp = competencies.find(c => c.number === compNum);
-        if (comp) {
-          compDescriptions[compNum] = comp.description;
-        }
-      }
-      
-      // Добавить описания к элементу
-      const enrichedItem = {
-        ...item,
-        competencyDescriptions: compDescriptions
-      };
-      setSelectedItem(enrichedItem);
-    } else {
-      setSelectedItem(item);
+    try {
+      // Загрузить детальную информацию об РПД
+      const response = await rpdService.getById(item.id);
+      setSelectedItem(response.data);
+      setModalMode('view');
+      setModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching RPD details:', error);
+      alert('Ошибка при загрузке данных РПД');
     }
-    
-    setModalMode('view');
-    setModalOpen(true);
   };
 
   const handleEdit = async (item) => {
@@ -220,45 +204,39 @@ const RPDPage = () => {
             <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>
               Индикаторы компетенций:
             </label>
-            {selectedItem?.competencyAchievementIndicators && selectedItem.competencyAchievementIndicators.length > 0 ? (
+            {selectedItem?.competencies && selectedItem.competencies.length > 0 ? (
               <div style={{ marginTop: '10px' }}>
-                {/* Группировка по компетенциям */}
-                {Object.entries(
-                  selectedItem.competencyAchievementIndicators.reduce((acc, ind) => {
-                    const compNum = ind.competencyNumber;
-                    if (!acc[compNum]) acc[compNum] = [];
-                    acc[compNum].push(ind);
-                    return acc;
-                  }, {})
-                ).map(([compNumber, indicators]) => (
-                  <div key={compNumber} style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+                {selectedItem.competencies.map((competency) => (
+                  <div key={competency.id} style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
                     <h4 style={{ margin: '0 0 10px 0', color: '#2c3e50' }}>
-                      Компетенция {compNumber}
-                      {selectedItem?.competencyDescriptions?.[compNumber] && (
-                        <span style={{ fontWeight: 'normal', fontSize: '14px', display: 'block', marginTop: '5px' }}>
-                          {selectedItem.competencyDescriptions[compNumber]}
-                        </span>
-                      )}
+                      Компетенция {competency.number}:
+                      <span style={{ fontWeight: 'normal', fontSize: '14px', display: 'block', marginTop: '5px' }}>
+                        {competency.description}
+                      </span>
                     </h4>
-                    {indicators.map(ind => (
-                      <div key={ind.id} style={{ marginBottom: '15px', padding: '10px', backgroundColor: 'white', borderRadius: '5px' }}>
-                        <div><strong>Индикатор {ind.number}:</strong> {ind.description}</div>
-                        {ind.indicatorKnow && (
-                          <div style={{ marginTop: '5px' }}><strong>Знать:</strong> {ind.indicatorKnow}</div>
-                        )}
-                        {ind.indicatorAble && (
-                          <div style={{ marginTop: '5px' }}><strong>Уметь:</strong> {ind.indicatorAble}</div>
-                        )}
-                        {ind.indicatorPossess && (
-                          <div style={{ marginTop: '5px' }}><strong>Владеть:</strong> {ind.indicatorPossess}</div>
-                        )}
-                      </div>
-                    ))}
+                    {competency.indicators && competency.indicators.length > 0 ? (
+                      competency.indicators.map(ind => (
+                        <div key={ind.id} style={{ marginBottom: '15px', padding: '10px', backgroundColor: 'white', borderRadius: '5px' }}>
+                          <div><strong>Индикатор {ind.number}:</strong> {ind.description}</div>
+                          {ind.indicatorKnow && (
+                            <div style={{ marginTop: '5px' }}><strong>Знать:</strong> {ind.indicatorKnow}</div>
+                          )}
+                          {ind.indicatorAble && (
+                            <div style={{ marginTop: '5px' }}><strong>Уметь:</strong> {ind.indicatorAble}</div>
+                          )}
+                          {ind.indicatorPossess && (
+                            <div style={{ marginTop: '5px' }}><strong>Владеть:</strong> {ind.indicatorPossess}</div>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ marginLeft: '10px', color: '#999' }}>Нет индикаторов</div>
+                    )}
                   </div>
                 ))}
               </div>
             ) : (
-              <span>Нет индикаторов</span>
+              <span>Нет компетенций</span>
             )}
           </div>
         </div>
