@@ -54,6 +54,20 @@ const HomePage = () => {
       color: '#fee140'
     },
     {
+      title: 'Head Hunter',
+      description: 'Сохраненные поисковые запросы и анализ',
+      path: '/saved-searches',
+      icon: '🔍',
+      color: '#ff6b6b'
+    },
+    {
+      title: 'Прогнозы',
+      description: 'Прогнозирование и анализ трендов',
+      path: '/foresights',
+      icon: '🔮',
+      color: '#845ec2'
+    },
+    {
       title: 'Эксперты',
       description: 'База данных экспертов',
       path: '/experts',
