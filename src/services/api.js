@@ -11,6 +11,40 @@ const api = axios.create({
   },
 });
 
+// Interceptor для добавления JWT токена в каждый запрос
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor для обработки ошибок авторизации
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Токен истек или невалиден
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Auth Service (Авторизация и регистрация)
+export const authService = {
+  login: (email, password) => api.post('/api/auth/login', { email, password }),
+  register: (firstName, lastName, middleName, email, password) => 
+    api.post('/api/auth/register', { firstName, lastName, middleName, email, password }),
+};
+
 // RPD (Рабочие Программы Дисциплин)
 export const rpdService = {
   getAll: () => api.get('/api/rpd'),

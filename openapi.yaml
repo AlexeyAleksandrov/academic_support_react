@@ -1730,6 +1730,40 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IndicatorDto"
+  /api/auth/login:
+    post:
+      summary: "POST api/auth/login"
+      operationId: "loginUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/auth/register:
+    post:
+      summary: "POST api/auth/register"
+      operationId: "registerUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
 components:
   schemas:
     SkillsGroup:
@@ -2377,4 +2411,31 @@ components:
         foresightPercentage:
           type: "number"
           format: "double"
+          nullable: true
+    LoginRequest:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+          nullable: true
+        password:
+          type: "string"
+          nullable: true
+    RegisterRequest:
+      type: "object"
+      properties:
+        firstName:
+          type: "string"
+          nullable: true
+        lastName:
+          type: "string"
+          nullable: true
+        middleName:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+          nullable: true
+        password:
+          type: "string"
           nullable: true
