@@ -12,10 +12,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-    # Доступ к бэкенду на хосте (работает для контейнеров на одном сервере)
-    extra_hosts:
-      - "backend:host-gateway"
 
 networks:
   app-network:
-    driver: bridge
+    external: true
