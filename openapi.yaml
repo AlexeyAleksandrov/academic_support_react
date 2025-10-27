@@ -453,13 +453,19 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "model"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "ollama"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CompetencyDto"
+                type: "object"
   /api/rpd:
     get:
       summary: "GET api/rpd"

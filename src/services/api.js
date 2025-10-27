@@ -73,8 +73,8 @@ export const keywordService = {
   createForIndicator: (competencyNumber, indicatorNumber, data) => 
     api.post(`/api/competencies/${competencyNumber}/indicators/${indicatorNumber}/keywords`, data),
   // Генерация ключевых слов для компетенции
-  generateForCompetency: (competencyId) => 
-    api.post(`/api/competencies/${competencyId}/keywords/generate`),
+  generateForCompetency: (competencyId, model = 'gigachat') => 
+    api.post(`/api/competencies/${competencyId}/keywords/generate`, null, { params: { model } }),
   // Соотнести все ключевые слова с технологиями
   matchAll: () => api.post('/api/keywords/match/all'),
 };
