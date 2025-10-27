@@ -17,7 +17,8 @@ echo "2. Stopping existing containers..."
 docker compose down
 
 echo "3. Pulling latest code from GitHub..."
-git pull origin master
+git fetch origin
+git reset --hard origin/master
 
 echo "4. Building and starting new containers..."
 docker compose up -d --build
