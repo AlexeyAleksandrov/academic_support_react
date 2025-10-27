@@ -300,13 +300,15 @@ const CompetenciesPage = () => {
       
       setIsGenerating(false);
       
-      if (errorCount === 0) {
-        alert(`Успешно сгенерированы ключевые слова для ${successCount} компетенций`);
-      } else {
-        alert(`Готово: ${successCount} успешно, ${errorCount} с ошибками`);
-      }
-      
-      fetchData();
+      // Небольшая задержка, чтобы пользователь увидел 100% прогресса
+      setTimeout(() => {
+        if (errorCount === 0) {
+          alert(`Успешно сгенерированы ключевые слова для ${successCount} компетенций`);
+        } else {
+          alert(`Готово: ${successCount} успешно, ${errorCount} с ошибками`);
+        }
+        fetchData();
+      }, 300);
     }
   };
 
