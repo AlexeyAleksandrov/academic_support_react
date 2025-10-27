@@ -13,6 +13,8 @@ const CompetenciesPage = () => {
   const [formData, setFormData] = useState({});
   const [allKeywords, setAllKeywords] = useState([]);
   const [selectedKeywords, setSelectedKeywords] = useState([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
 
   const columns = [
     { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
@@ -278,10 +280,14 @@ const CompetenciesPage = () => {
     }
     
     if (window.confirm('Сгенерировать ключевые слова с помощью ИИ для всех компетенций?')) {
+      setIsGenerating(true);
+      setProgress({ current: 0, total: data.length });
+      
       let successCount = 0;
       let errorCount = 0;
       
-      for (const comp of data) {
+      for (let i = 0; i < data.length; i++) {
+        const comp = data[i];
         try {
           await keywordService.generateForCompetency(comp.id);
           successCount++;
@@ -289,7 +295,10 @@ const CompetenciesPage = () => {
           console.error(`Error generating keywords for competency ${comp.number}:`, error);
           errorCount++;
         }
+        setProgress({ current: i + 1, total: data.length });
       }
+      
+      setIsGenerating(false);
       
       if (errorCount === 0) {
         alert(`Успешно сгенерированы ключевые слова для ${successCount} компетенций`);
@@ -311,9 +320,49 @@ const CompetenciesPage = () => {
       </div>
 
       <div className="action-buttons">
-        <button className="btn btn-action" onClick={handleGenerateAllKeywords}>
+        <button 
+          className="btn btn-action" 
+          onClick={handleGenerateAllKeywords}
+          disabled={isGenerating}
+        >
           🤖 Выделить ключевые слова с помощью ИИ
         </button>
+        {isGenerating && (
+          <div style={{
+            marginTop: '10px',
+            padding: '15px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '8px',
+            border: '1px solid #ddd'
+          }}>
+            <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>
+              Обработка компетенций: {progress.current} из {progress.total}
+            </div>
+            <div style={{
+              width: '100%',
+              height: '24px',
+              backgroundColor: '#e0e0e0',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              position: 'relative'
+            }}>
+              <div style={{
+                width: `${(progress.current / progress.total) * 100}%`,
+                height: '100%',
+                backgroundColor: '#4caf50',
+                transition: 'width 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}>
+                {Math.round((progress.current / progress.total) * 100)}%
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <DataTable
