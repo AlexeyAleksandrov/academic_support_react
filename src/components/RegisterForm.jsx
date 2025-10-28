@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './RegisterForm.css';
 
@@ -15,6 +15,10 @@ const RegisterForm = () => {
   const [error, setError] = useState('');
   const { register, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Получаем страницу, с которой пользователь пришел на register
+  const from = location.state?.from?.pathname || '/';
 
   const handleChange = (e) => {
     setFormData({
@@ -52,7 +56,8 @@ const RegisterForm = () => {
     );
 
     if (result.success) {
-      navigate('/');
+      // Перенаправляем пользователя на исходную страницу
+      navigate(from, { replace: true });
     } else {
       setError(result.error || 'Ошибка регистрации. Попробуйте снова.');
     }
