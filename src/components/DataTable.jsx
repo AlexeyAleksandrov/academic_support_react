@@ -32,59 +32,61 @@ const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customAct
       const item = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Открыть меню</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Действия</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            
-            {/* Кастомные действия */}
-            {customActions && customActions.map((action, index) => (
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Открыть меню</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Действия</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              {/* Кастомные действия */}
+              {customActions && customActions.map((action, index) => (
+                <DropdownMenuItem
+                  key={`custom-${index}`}
+                  onClick={() => action.onClick(item)}
+                  className="cursor-pointer"
+                >
+                  {action.icon && <span className="mr-2">{action.icon}</span>}
+                  {action.title}
+                </DropdownMenuItem>
+              ))}
+              
+              {customActions && customActions.length > 0 && <DropdownMenuSeparator />}
+              
+              {/* Основные действия */}
               <DropdownMenuItem
-                key={`custom-${index}`}
-                onClick={() => action.onClick(item)}
+                onClick={() => onView(item)}
                 className="cursor-pointer"
               >
-                {action.icon && <span className="mr-2">{action.icon}</span>}
-                {action.title}
+                <Eye className="mr-2 h-4 w-4" />
+                Просмотр
               </DropdownMenuItem>
-            ))}
-            
-            {customActions && customActions.length > 0 && <DropdownMenuSeparator />}
-            
-            {/* Основные действия */}
-            <DropdownMenuItem
-              onClick={() => onView(item)}
-              className="cursor-pointer"
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              Просмотр
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem
-              onClick={() => onEdit(item)}
-              className="cursor-pointer"
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Редактировать
-            </DropdownMenuItem>
-            
-            <DropdownMenuSeparator />
-            
-            <DropdownMenuItem
-              onClick={() => onDelete(item)}
-              className="cursor-pointer text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Удалить
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              
+              <DropdownMenuItem
+                onClick={() => onEdit(item)}
+                className="cursor-pointer"
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Редактировать
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuItem
+                onClick={() => onDelete(item)}
+                className="cursor-pointer text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Удалить
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   };
