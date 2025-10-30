@@ -27,7 +27,7 @@ const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customAct
   // Создаем колонку с действиями
   const actionColumn = {
     id: "actions",
-    header: "Действия",
+    header: "",
     cell: ({ row }) => {
       const item = row.original;
 
