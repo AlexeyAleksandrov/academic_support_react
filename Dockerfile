@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # Multi-stage build для оптимизации размера образа
 
 # Стадия 1: Сборка приложения
@@ -9,14 +11,18 @@ WORKDIR /app
 # Копирование package.json и package-lock.json
 COPY package*.json ./
 
-# Установка всех зависимостей (включая devDependencies для сборки)
-RUN npm ci --prefer-offline --no-audit && npm cache clean --force
+# Установка всех зависимостей с кэшированием npm
+# BuildKit будет кэшировать npm cache между сборками
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline --no-audit
 
 # Копирование исходного кода
 COPY . .
 
-# Сборка приложения для production
-RUN npm run build
+# Сборка приложения для production с кэшированием Vite
+# Кэшируем .vite папку для ускорения повторных сборок
+RUN --mount=type=cache,target=/app/node_modules/.vite \
+    npm run build
 
 # Стадия 2: Production образ с nginx
 FROM nginx:alpine

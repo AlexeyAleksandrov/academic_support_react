@@ -24,6 +24,8 @@ dist-ssr
 # Git
 .git
 .gitignore
+.github
+.git/hooks
 
 # Docker
 Dockerfile
@@ -48,3 +50,8 @@ logs
 README.md
 LICENSE
 *.md
+
+# Temporary files
+*.tmp
+*.temp
+Thumbs.db

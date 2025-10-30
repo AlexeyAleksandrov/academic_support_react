@@ -4,6 +4,10 @@ set -e  # Остановить выполнение при любой ошибк
 echo "=== Starting deployment ==="
 date
 
+# Включаем BuildKit для ускорения сборки и кэширования
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
 echo "1. Creating external network if not exists..."
 # Проверяем, существует ли сеть
 if ! docker network ls | grep -q app-network; then
@@ -20,7 +24,7 @@ echo "3. Pulling latest code from GitHub..."
 git fetch origin
 git reset --hard origin/master
 
-echo "4. Building and starting new containers..."
+echo "4. Building and starting new containers with BuildKit..."
 docker compose up -d --build
 
 echo "5. Checking container status..."

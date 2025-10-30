@@ -14,6 +14,33 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Оптимизации для production сборки
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Удалить console.log в production
+        drop_debugger: true,
+      },
+    },
+    // Разделение на чанки для оптимизации
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor чанки для библиотек
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-label', '@radix-ui/react-slot', '@radix-ui/react-dropdown-menu'],
+          'table-vendor': ['@tanstack/react-table'],
+          'utils': ['clsx', 'tailwind-merge', 'class-variance-authority'],
+        },
+      },
+    },
+    // Увеличиваем лимит размера чанка
+    chunkSizeWarningLimit: 1000,
+    // Оптимизация времени сборки
+    sourcemap: false, // Отключаем sourcemaps для production
+    reportCompressedSize: false, // Ускоряет сборку
+  },
   server: {
     proxy: {
       '/api': {
