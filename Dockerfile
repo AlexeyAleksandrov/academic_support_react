@@ -1,7 +1,7 @@
 # Multi-stage build для оптимизации размера образа
 
 # Стадия 1: Сборка приложения
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Установка рабочей директории
 WORKDIR /app
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Установка всех зависимостей (включая devDependencies для сборки)
-RUN npm ci && npm cache clean --force
+RUN npm ci --prefer-offline --no-audit && npm cache clean --force
 
 # Копирование исходного кода
 COPY . .
