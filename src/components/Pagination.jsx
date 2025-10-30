@@ -1,5 +1,5 @@
 import React from 'react';
-import './Pagination.css';
+import { Button } from "@/components/ui/button";
 
 const Pagination = ({ currentPage, totalCount, itemsPerPage, onPageChange }) => {
   const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -18,95 +18,101 @@ const Pagination = ({ currentPage, totalCount, itemsPerPage, onPageChange }) => 
     // Первые 3 страницы: [1][2][3]
     for (let i = 1; i <= Math.min(3, totalPages); i++) {
       buttons.push(
-        <button
+        <Button
           key={`page-${i}`}
-          className={`pagination-btn ${currentPage === i ? 'active' : ''}`}
+          variant={currentPage === i ? 'default' : 'outline'}
+          size="sm"
           onClick={() => handlePageChange(i)}
         >
           {i}
-        </button>
+        </Button>
       );
     }
 
     // Кнопка следующей страницы: [>]
     if (currentPage < totalPages) {
       buttons.push(
-        <button
+        <Button
           key="next"
-          className="pagination-btn"
+          variant="outline"
+          size="sm"
           onClick={() => handlePageChange(currentPage + 1)}
           title="Следующая страница"
         >
           &gt;
-        </button>
+        </Button>
       );
     }
 
     // Кнопка в конец: [>>]
     if (currentPage < totalPages) {
       buttons.push(
-        <button
+        <Button
           key="last"
-          className="pagination-btn"
+          variant="outline"
+          size="sm"
           onClick={() => handlePageChange(totalPages)}
           title="Последняя страница"
         >
           &gt;&gt;
-        </button>
+        </Button>
       );
     }
 
     // Текущая страница: [M]
     if (currentPage > 3 && currentPage < totalPages - 2) {
       buttons.push(
-        <button
-          key={`current-${currentPage}`}
-          className="pagination-btn active"
-          disabled
+        <Button
+          key="current"
+          variant="default"
+          size="sm"
         >
           {currentPage}
-        </button>
+        </Button>
       );
     }
 
     // Кнопка в начало: [<<]
     if (currentPage > 1) {
       buttons.push(
-        <button
+        <Button
           key="first"
-          className="pagination-btn"
+          variant="outline"
+          size="sm"
           onClick={() => handlePageChange(1)}
           title="Первая страница"
         >
           &lt;&lt;
-        </button>
+        </Button>
       );
     }
 
     // Кнопка предыдущей страницы: [<]
     if (currentPage > 1) {
       buttons.push(
-        <button
+        <Button
           key="prev"
-          className="pagination-btn"
+          variant="outline"
+          size="sm"
           onClick={() => handlePageChange(currentPage - 1)}
           title="Предыдущая страница"
         >
           &lt;
-        </button>
+        </Button>
       );
     }
 
     // Последние 3 страницы: [N-2][N-1][N]
     for (let i = Math.max(totalPages - 2, 4); i <= totalPages; i++) {
       buttons.push(
-        <button
+        <Button
           key={`page-${i}`}
-          className={`pagination-btn ${currentPage === i ? 'active' : ''}`}
+          variant={currentPage === i ? 'default' : 'outline'}
+          size="sm"
           onClick={() => handlePageChange(i)}
         >
           {i}
-        </button>
+        </Button>
       );
     }
 
@@ -114,13 +120,13 @@ const Pagination = ({ currentPage, totalCount, itemsPerPage, onPageChange }) => 
   };
 
   return (
-    <div className="pagination-container">
-      <div className="pagination-info">
-        Страница {currentPage} из {totalPages} (всего записей: {totalCount})
-      </div>
-      <div className="pagination-buttons">
+    <div className="flex items-center justify-center gap-2 py-4">
+      <div className="flex items-center gap-1">
         {renderPageButtons()}
       </div>
+      <span className="ml-4 text-sm text-muted-foreground">
+        Страница {currentPage} из {totalPages} (Всего: {totalCount})
+      </span>
     </div>
   );
 };

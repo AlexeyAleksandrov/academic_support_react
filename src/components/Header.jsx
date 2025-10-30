@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './Header.css';
+import { Button } from "@/components/ui/button";
 
 const Header = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -13,29 +13,42 @@ const Header = () => {
   };
 
   return (
-    <header className="app-header">
-      <Link to="/" style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
-        <h1>Academic Support System</h1>
-        <p className="subtitle">Система поддержки академических программ</p>
-      </Link>
-      <div className="auth-section">
-        {isAuthenticated() ? (
-          <div className="user-info">
-            {user?.email && <span className="user-email">{user.email}</span>}
-            <button onClick={handleLogout} className="logout-button">
-              Выйти
-            </button>
+    <header className="border-b bg-background">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="flex flex-col hover:opacity-80 transition-opacity">
+            <h1 className="text-2xl font-bold text-foreground">
+              Academic Support System
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Система поддержки академических программ
+            </p>
+          </Link>
+          
+          <div className="flex items-center gap-4">
+            {isAuthenticated() ? (
+              <div className="flex items-center gap-3">
+                {user?.email && (
+                  <span className="text-sm text-muted-foreground hidden sm:inline">
+                    {user.email}
+                  </span>
+                )}
+                <Button onClick={handleLogout} variant="outline">
+                  Выйти
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link to="/login">
+                  <Button variant="ghost">Вход</Button>
+                </Link>
+                <Link to="/register">
+                  <Button>Регистрация</Button>
+                </Link>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="auth-buttons">
-            <Link to="/login">
-              <button className="login-button">Вход</button>
-            </Link>
-            <Link to="/register">
-              <button className="register-button">Регистрация</button>
-            </Link>
-          </div>
-        )}
+        </div>
       </div>
     </header>
   );

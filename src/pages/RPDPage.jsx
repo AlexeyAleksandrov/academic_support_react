@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import { rpdService, competencyService, indicatorService } from '../services/api';
-import './PageStyles.css';
 
 const RPDPage = () => {
   const navigate = useNavigate();

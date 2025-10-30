@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import './Navigation.css';
 
 const Navigation = () => {
   const navItems = [
@@ -19,22 +18,28 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="navigation">
-      <ul className="nav-list">
-        {navItems.map((item) => (
-          <li key={item.path} className="nav-item">
-            <NavLink
-              to={item.path}
-              end={item.path === '/'}
-              className={({ isActive }) =>
-                isActive ? 'nav-link active' : 'nav-link'
-              }
-            >
-              {item.label}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+    <nav className="bg-muted/30 border-b">
+      <div className="container mx-auto px-4">
+        <ul className="flex flex-wrap gap-1 py-2">
+          {navItems.map((item) => (
+            <li key={item.path}>
+              <NavLink
+                to={item.path}
+                end={item.path === '/'}
+                className={({ isActive }) =>
+                  `inline-block px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 };

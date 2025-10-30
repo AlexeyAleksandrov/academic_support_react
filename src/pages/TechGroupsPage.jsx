@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import { techGroupService } from '../services/api';
-import './PageStyles.css';
 
 const TechGroupsPage = () => {
   const [data, setData] = useState([]);

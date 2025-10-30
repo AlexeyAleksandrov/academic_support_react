@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './LoginForm.css';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -34,48 +38,62 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="login-form-container">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h2>Вход в систему</h2>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="example@mail.com"
-            disabled={loading}
-            required
-          />
-        </div>
+    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Вход в систему</CardTitle>
+          <CardDescription className="text-center">
+            Введите ваши учетные данные для доступа к системе
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@mail.com"
+                disabled={loading}
+                required
+              />
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Пароль</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Введите пароль"
-            disabled={loading}
-            required
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Пароль</Label>
+              <Input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Введите пароль"
+                disabled={loading}
+                required
+              />
+            </div>
 
-        <button type="submit" className="submit-button" disabled={loading}>
-          {loading ? 'Вход...' : 'Войти'}
-        </button>
-
-        <div className="form-footer">
-          <p>
-            Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Вход...' : 'Войти'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
+            Нет аккаунта?{' '}
+            <Link to="/register" className="text-primary hover:underline font-medium">
+              Зарегистрироваться
+            </Link>
           </p>
-        </div>
-      </form>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

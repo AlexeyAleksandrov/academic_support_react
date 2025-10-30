@@ -19,16 +19,15 @@ import ExpertsPage from './pages/ExpertsPage.jsx';
 import ExpertOpinionsPage from './pages/ExpertOpinionsPage.jsx';
 import SavedSearchesPage from './pages/SavedSearchesPage.jsx';
 import ForesightsPage from './pages/ForesightsPage.jsx';
-import './App.css';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
+        <div className="min-h-screen bg-background">
           <Header />
           <Navigation />
-          <main className="main-content">
+          <main className="container mx-auto px-4 py-6">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />

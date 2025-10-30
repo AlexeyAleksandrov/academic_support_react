@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './RegisterForm.css';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -64,105 +68,123 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="register-form-container">
-      <form className="register-form" onSubmit={handleSubmit}>
-        <h2>Регистрация</h2>
+    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Регистрация</CardTitle>
+          <CardDescription className="text-center">
+            Создайте аккаунт для доступа к системе
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Фамилия *</Label>
+                <Input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  placeholder="Иванов"
+                  disabled={loading}
+                  required
+                />
+              </div>
 
-        {error && <div className="error-message">{error}</div>}
+              <div className="space-y-2">
+                <Label htmlFor="firstName">Имя *</Label>
+                <Input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  placeholder="Иван"
+                  disabled={loading}
+                  required
+                />
+              </div>
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="lastName">Фамилия *</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Иванов"
-            disabled={loading}
-            required
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="middleName">Отчество</Label>
+              <Input
+                type="text"
+                id="middleName"
+                name="middleName"
+                value={formData.middleName}
+                onChange={handleChange}
+                placeholder="Иванович"
+                disabled={loading}
+              />
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="firstName">Имя *</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="Иван"
-            disabled={loading}
-            required
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="example@mail.com"
+                disabled={loading}
+                required
+              />
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="middleName">Отчество</label>
-          <input
-            type="text"
-            id="middleName"
-            name="middleName"
-            value={formData.middleName}
-            onChange={handleChange}
-            placeholder="Иванович"
-            disabled={loading}
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Пароль *</Label>
+                <Input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Минимум 6 символов"
+                  disabled={loading}
+                  required
+                />
+              </div>
 
-        <div className="form-group">
-          <label htmlFor="email">Email *</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="example@mail.com"
-            disabled={loading}
-            required
-          />
-        </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Подтверждение пароля *</Label>
+                <Input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Повторите пароль"
+                  disabled={loading}
+                  required
+                />
+              </div>
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Пароль *</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Минимум 6 символов"
-            disabled={loading}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Подтверждение пароля *</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder="Повторите пароль"
-            disabled={loading}
-            required
-          />
-        </div>
-
-        <button type="submit" className="submit-button" disabled={loading}>
-          {loading ? 'Регистрация...' : 'Зарегистрироваться'}
-        </button>
-
-        <div className="form-footer">
-          <p>
-            Уже есть аккаунт? <Link to="/login">Войти</Link>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Регистрация...' : 'Зарегистрироваться'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
+            Уже есть аккаунт?{' '}
+            <Link to="/login" className="text-primary hover:underline font-medium">
+              Войти
+            </Link>
           </p>
-        </div>
-      </form>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

@@ -1,44 +1,32 @@
-import React, { useEffect } from 'react';
-import './Modal.css';
+import React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Modal = ({ isOpen, onClose, title, children, size = 'medium' }) => {
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  // Мапим размеры на классы Tailwind
+  const sizeClasses = {
+    small: 'sm:max-w-md',
+    medium: 'sm:max-w-lg',
+    large: 'sm:max-w-2xl',
+    xlarge: 'sm:max-w-4xl',
+  };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className={`modal-content modal-${size}`} 
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-header">
-          <h2>{title}</h2>
-          <button className="modal-close" onClick={onClose}>
-            ×
-          </button>
-        </div>
-        <div className="modal-body">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={sizeClasses[size] || sizeClasses.medium}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
           {children}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import { rpdSkillService, technologyService, rpdService, dstAggregationService } from '../services/api';
-import './PageStyles.css';
 
 const RpdSkillsPage = () => {
   const { rpdId } = useParams();

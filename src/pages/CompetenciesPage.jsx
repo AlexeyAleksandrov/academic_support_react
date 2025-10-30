@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import { competencyService, keywordService } from '../services/api';
-import './PageStyles.css';
 
 const CompetenciesPage = () => {
   const [data, setData] = useState([]);

@@ -3,7 +3,6 @@ import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
 import { vacancyService } from '../services/api';
-import './PageStyles.css';
 
 const VacanciesPage = () => {
   const [data, setData] = useState([]);

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 import { expertOpinionService, expertService, technologyService } from '../services/api';
-import './PageStyles.css';
 
 const ExpertOpinionsPage = () => {
   const [data, setData] = useState([]);

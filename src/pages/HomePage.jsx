@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './HomePage.css';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const HomePage = () => {
   const sections = [
@@ -9,104 +9,102 @@ const HomePage = () => {
       description: 'Управление рабочими программами дисциплин',
       path: '/rpd',
       icon: '📚',
-      color: '#667eea'
     },
     {
       title: 'Компетенции',
       description: 'Управление компетенциями образовательных программ',
       path: '/competencies',
       icon: '🎓',
-      color: '#764ba2'
     },
     {
       title: 'Индикаторы',
       description: 'Индикаторы достижения компетенций',
       path: '/indicators',
       icon: '📊',
-      color: '#f093fb'
     },
     {
       title: 'Технологии',
       description: 'Рабочие технологии и навыки',
       path: '/technologies',
       icon: '💻',
-      color: '#4facfe'
     },
     {
       title: 'Группы технологий',
       description: 'Категории технологий',
       path: '/tech-groups',
       icon: '🗂️',
-      color: '#43e97b'
     },
     {
       title: 'Ключевые слова',
       description: 'Ключевые слова для связи с технологиями',
       path: '/keywords',
       icon: '🔑',
-      color: '#fa709a'
     },
     {
       title: 'Вакансии',
       description: 'Управление вакансиями рынка труда',
       path: '/vacancies',
       icon: '💼',
-      color: '#fee140'
     },
     {
       title: 'Head Hunter',
       description: 'Сохраненные поисковые запросы и анализ',
       path: '/saved-searches',
       icon: '🔍',
-      color: '#ff6b6b'
     },
     {
       title: 'Прогнозы',
       description: 'Прогнозирование и анализ трендов',
       path: '/foresights',
       icon: '🔮',
-      color: '#845ec2'
     },
     {
       title: 'Эксперты',
       description: 'База данных экспертов',
       path: '/experts',
       icon: '👨‍🏫',
-      color: '#30cfd0'
     },
     {
       title: 'Мнения экспертов',
       description: 'Экспертные оценки и рекомендации',
       path: '/expert-opinions',
       icon: '💭',
-      color: '#a8edea'
     }
   ];
 
   return (
-    <div className="home-container">
-      <div className="home-hero">
-        <h1>Добро пожаловать в Academic Support System</h1>
-        <p>Комплексная система управления академическими программами и анализа рынка труда</p>
+    <div className="space-y-8">
+      <div className="text-center space-y-2">
+        <h1 className="text-4xl font-bold tracking-tight">
+          Добро пожаловать в Academic Support System
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          Комплексная система управления академическими программами и анализа рынка труда
+        </p>
       </div>
 
-      <div className="home-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sections.map((section, index) => (
           <Link
             key={index}
             to={section.path}
-            className="home-card"
-            style={{ '--card-color': section.color }}
+            className="transition-transform hover:scale-105"
           >
-            <div className="card-icon">{section.icon}</div>
-            <h3>{section.title}</h3>
-            <p>{section.description}</p>
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="text-4xl mb-2">{section.icon}</div>
+                <CardTitle>{section.title}</CardTitle>
+                <CardDescription>{section.description}</CardDescription>
+              </CardHeader>
+            </Card>
           </Link>
         ))}
       </div>
 
-      <div className="home-footer">
-        <p>Выберите раздел для начала работы</p>
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">
+          Выберите раздел для начала работы
+        </p>
       </div>
     </div>
   );

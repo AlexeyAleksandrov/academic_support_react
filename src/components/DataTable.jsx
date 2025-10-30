@@ -1,78 +1,106 @@
 import React from 'react';
-import './DataTable.css';
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customActions }) => {
   if (loading) {
-    return <div className="loading">Загрузка данных...</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <p className="text-muted-foreground">Загрузка данных...</p>
+      </div>
+    );
   }
 
   if (!data || data.length === 0) {
-    return <div className="no-data">Нет данных для отображения</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <p className="text-muted-foreground">Нет данных для отображения</p>
+      </div>
+    );
   }
 
   // Фильтруем null и undefined элементы
   const validData = data.filter(item => item !== null && item !== undefined);
 
   if (validData.length === 0) {
-    return <div className="no-data">Нет данных для отображения</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <p className="text-muted-foreground">Нет данных для отображения</p>
+      </div>
+    );
   }
 
   return (
-    <div className="table-container">
-      <table className="data-table">
-        <thead>
-          <tr>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
             {columns.map((column, index) => (
-              <th key={index}>{column.header}</th>
+              <TableHead key={index}>{column.header}</TableHead>
             ))}
-            <th className="actions-column">Действия</th>
-          </tr>
-        </thead>
-        <tbody>
+            <TableHead className="w-[200px] text-right">Действия</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {validData.map((row, rowIndex) => (
-            <tr key={row.id || rowIndex}>
+            <TableRow key={row.id || rowIndex}>
               {columns.map((column, colIndex) => (
-                <td key={colIndex}>
+                <TableCell key={colIndex}>
                   {column.render ? column.render(row, rowIndex) : row[column.field]}
-                </td>
+                </TableCell>
               ))}
-              <td className="actions-cell">
-                {customActions && customActions.map((action, actionIndex) => (
-                  <button
-                    key={actionIndex}
-                    className={`action-btn ${action.className || ''}`}
-                    onClick={() => action.onClick(row)}
-                    title={action.title}
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  {customActions && customActions.map((action, actionIndex) => (
+                    <Button
+                      key={actionIndex}
+                      size="sm"
+                      variant="ghost"
+                      className={action.className || ''}
+                      onClick={() => action.onClick(row)}
+                      title={action.title}
+                    >
+                      {action.icon}
+                    </Button>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onView(row)}
+                    title="Просмотр"
                   >
-                    {action.icon}
-                  </button>
-                ))}
-                <button
-                  className="action-btn view-btn"
-                  onClick={() => onView(row)}
-                  title="Просмотр"
-                >
-                  👁️
-                </button>
-                <button
-                  className="action-btn edit-btn"
-                  onClick={() => onEdit(row)}
-                  title="Редактировать"
-                >
-                  ✏️
-                </button>
-                <button
-                  className="action-btn delete-btn"
-                  onClick={() => onDelete(row)}
-                  title="Удалить"
-                >
-                  🗑️
-                </button>
-              </td>
-            </tr>
+                    👁️
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onEdit(row)}
+                    title="Редактировать"
+                  >
+                    ✏️
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onDelete(row)}
+                    title="Удалить"
+                    className="text-destructive hover:text-destructive"
+                  >
+                    🗑️
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
