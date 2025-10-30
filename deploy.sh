@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e  # Остановить выполнение при любой ошибке
 
+# Включаем BuildKit для ускорения сборки и кэширования
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
 echo "=== Starting deployment ==="
 date
 

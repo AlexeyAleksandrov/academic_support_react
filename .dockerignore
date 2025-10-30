@@ -24,11 +24,13 @@ dist-ssr
 # Git
 .git
 .gitignore
+.github
 
 # Docker
 Dockerfile
 docker-compose.yml
 .dockerignore
+deploy.sh
 
 # Tests
 coverage
@@ -48,3 +50,8 @@ logs
 README.md
 LICENSE
 *.md
+
+# Temporary files
+*.tmp
+*.temp
+Thumbs.db

@@ -1,7 +1,9 @@
+# syntax=docker/dockerfile:1
+
 # Multi-stage build для оптимизации размера образа
 
 # Стадия 1: Сборка приложения
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Установка рабочей директории
 WORKDIR /app
@@ -9,8 +11,10 @@ WORKDIR /app
 # Копирование package.json и package-lock.json
 COPY package*.json ./
 
-# Установка всех зависимостей (включая devDependencies для сборки)
-RUN npm ci && npm cache clean --force
+# Установка всех зависимостей с кэшированием npm
+# BuildKit будет кэшировать npm cache между сборками
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline --no-audit
 
 # Копирование исходного кода
 COPY . .
