@@ -18,9 +18,20 @@ const ExpertsPage = () => {
   };
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Название', field: 'name' },
-    { header: 'Доверие', field: 'trust', render: (row) => formatPercent(row.trust) },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'name',
+      header: 'Название',
+    },
+    {
+      accessorKey: 'trust',
+      header: 'Доверие',
+      cell: ({ row }) => formatPercent(row.original.trust),
+    },
   ];
 
   useEffect(() => {

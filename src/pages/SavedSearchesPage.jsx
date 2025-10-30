@@ -12,8 +12,15 @@ const SavedSearchesPage = () => {
   const [formData, setFormData] = useState({});
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Поисковый запрос', field: 'searchQuery' },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'searchQuery',
+      header: 'Поисковый запрос',
+    },
   ];
 
   useEffect(() => {

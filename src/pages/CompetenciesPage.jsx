@@ -16,9 +16,20 @@ const CompetenciesPage = () => {
   const [progress, setProgress] = useState({ current: 0, total: 0 });
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Номер', field: 'number' },
-    { header: 'Описание', field: 'description', render: (row) => row.description?.substring(0, 80) || '' },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'number',
+      header: 'Номер',
+    },
+    {
+      accessorKey: 'description',
+      header: 'Описание',
+      cell: ({ row }) => row.original.description?.substring(0, 80) || '',
+    },
   ];
 
   useEffect(() => {

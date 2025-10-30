@@ -12,8 +12,15 @@ const KeywordsPage = () => {
   const [formData, setFormData] = useState({});
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Ключевое слово', field: 'keyword' },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'keyword',
+      header: 'Ключевое слово',
+    },
   ];
 
   useEffect(() => {

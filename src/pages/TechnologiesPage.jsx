@@ -24,10 +24,25 @@ const TechnologiesPage = () => {
   };
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Описание', field: 'description' },
-    { header: 'Востребованность', field: 'marketDemand', render: (row) => formatPercent(row.marketDemand) },
-    { header: 'Группа', field: 'skillsGroupId', render: (row) => groupsMap[row.skillsGroupId] || '-' },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'description',
+      header: 'Описание',
+    },
+    {
+      accessorKey: 'marketDemand',
+      header: 'Востребованность',
+      cell: ({ row }) => formatPercent(row.original.marketDemand),
+    },
+    {
+      accessorKey: 'skillsGroupId',
+      header: 'Группа',
+      cell: ({ row }) => groupsMap[row.original.skillsGroupId] || '-',
+    },
   ];
 
   useEffect(() => {

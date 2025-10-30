@@ -17,9 +17,19 @@ const RPDPage = () => {
   const [selectedIndicators, setSelectedIndicators] = useState({});
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Название', field: 'disciplineName' },
-    { header: 'Год', field: 'year' },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'disciplineName',
+      header: 'Название',
+    },
+    {
+      accessorKey: 'year',
+      header: 'Год',
+    },
   ];
 
   useEffect(() => {

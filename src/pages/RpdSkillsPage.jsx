@@ -20,18 +20,22 @@ const RpdSkillsPage = () => {
   const [loadingDst, setLoadingDst] = useState(false);
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
     { 
+      accessorKey: 'workSkillId',
       header: 'Навык', 
-      field: 'workSkillId',
-      render: (row) => {
-        const skill = workSkills.find(s => s.id === row.workSkillId);
-        return skill ? skill.description : `ID: ${row.workSkillId}`;
+      cell: ({ row }) => {
+        const skill = workSkills.find(s => s.id === row.original.workSkillId);
+        return skill ? skill.description : `ID: ${row.original.workSkillId}`;
       }
     },
     { 
+      accessorKey: 'time',
       header: 'Время (акад. часы)', 
-      field: 'time'
     },
   ];
 

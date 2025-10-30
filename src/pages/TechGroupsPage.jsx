@@ -20,9 +20,20 @@ const TechGroupsPage = () => {
   };
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Описание', field: 'description' },
-    { header: 'Востребованность', field: 'marketDemand', render: (row) => formatPercent(row.marketDemand) },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'description',
+      header: 'Описание',
+    },
+    {
+      accessorKey: 'marketDemand',
+      header: 'Востребованность',
+      cell: ({ row }) => formatPercent(row.original.marketDemand),
+    },
   ];
 
   useEffect(() => {

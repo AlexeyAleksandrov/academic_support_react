@@ -13,9 +13,24 @@ const ForesightsPage = () => {
   const [allWorkSkills, setAllWorkSkills] = useState([]);
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
-    { header: 'Источник', field: 'sourceName' },
-    { header: 'Навык', field: 'workSkillId', render: (row) => getWorkSkillName(row.workSkillId) },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      accessorKey: 'sourceName',
+      header: 'Источник',
+    },
+    {
+      accessorKey: 'workSkillId',
+      header: 'Навык',
+      cell: ({ row }) => getWorkSkillName(row.original.workSkillId),
+    },
+    {
+      accessorKey: 'year',
+      header: 'Год',
+    },
   ];
 
   useEffect(() => {

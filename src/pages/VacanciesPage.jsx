@@ -36,9 +36,20 @@ const VacanciesPage = () => {
   };
 
   const columns = [
-    { header: '№', field: 'rowNumber', render: (row, index) => (currentPage - 1) * itemsPerPage + index + 1 },
-    { header: 'Название', field: 'name' },
-    { header: 'Дата публикации', field: 'publishedAt', render: (row) => formatDate(row.publishedAt) },
+    {
+      accessorKey: 'rowNumber',
+      header: '№',
+      cell: ({ row }) => (currentPage - 1) * itemsPerPage + row.index + 1,
+    },
+    {
+      accessorKey: 'name',
+      header: 'Название',
+    },
+    {
+      accessorKey: 'publishedAt',
+      header: 'Дата публикации',
+      cell: ({ row }) => formatDate(row.original.publishedAt),
+    },
   ];
 
   useEffect(() => {

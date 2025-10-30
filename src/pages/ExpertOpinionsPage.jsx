@@ -22,10 +22,25 @@ const ExpertOpinionsPage = () => {
   };
 
   const columns = [
-    { header: 'Эксперт', field: 'expertId', render: (row) => expertsMap[row.expertId] || `ID: ${row.expertId}` },
-    { header: 'Индикатор', field: 'competencyAchievementIndicatorId' },
-    { header: 'Навык', field: 'workSkillId', render: (row) => skillsMap[row.workSkillId] || `ID: ${row.workSkillId}` },
-    { header: 'Важность', field: 'skillImportance', render: (row) => formatPercent(row.skillImportance) },
+    {
+      accessorKey: 'expertId',
+      header: 'Эксперт',
+      cell: ({ row }) => expertsMap[row.original.expertId] || `ID: ${row.original.expertId}`,
+    },
+    {
+      accessorKey: 'competencyAchievementIndicatorId',
+      header: 'Индикатор',
+    },
+    {
+      accessorKey: 'workSkillId',
+      header: 'Навык',
+      cell: ({ row }) => skillsMap[row.original.workSkillId] || `ID: ${row.original.workSkillId}`,
+    },
+    {
+      accessorKey: 'skillImportance',
+      header: 'Важность',
+      cell: ({ row }) => formatPercent(row.original.skillImportance),
+    },
   ];
 
   useEffect(() => {
