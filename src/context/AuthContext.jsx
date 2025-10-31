@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { authService } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -54,21 +55,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Ошибка входа');
-      }
-
-      const data = await response.json();
-      const authToken = data.token;
+      const response = await authService.login(email, password);
+      const authToken = response.data.token;
 
       localStorage.setItem('authToken', authToken);
       setToken(authToken);
@@ -77,7 +65,8 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: error.message };
+      const errorMessage = error.response?.data?.message || error.message || 'Ошибка входа';
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }
@@ -86,21 +75,8 @@ export const AuthProvider = ({ children }) => {
   const register = async (firstName, lastName, middleName, email, password) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ firstName, lastName, middleName, email, password }),
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Ошибка регистрации');
-      }
-
-      const data = await response.json();
-      const authToken = data.token;
+      const response = await authService.register(firstName, lastName, middleName, email, password);
+      const authToken = response.data.token;
 
       localStorage.setItem('authToken', authToken);
       setToken(authToken);
@@ -109,7 +85,8 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Register error:', error);
-      return { success: false, error: error.message };
+      const errorMessage = error.response?.data?.message || error.message || 'Ошибка регистрации';
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }
