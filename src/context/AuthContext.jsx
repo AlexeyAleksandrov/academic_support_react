@@ -14,7 +14,42 @@ export const AuthProvider = ({ children }) => {
       setToken(savedToken);
       // Можно добавить запрос для получения информации о пользователе
     }
-  }, []);
+
+    // Отслеживаем изменения в localStorage (работает между вкладками)
+    const handleStorageChange = (e) => {
+      if (e.key === 'authToken') {
+        if (e.newValue === null) {
+          // Токен был удален - выполняем выход
+          setToken(null);
+          setUser(null);
+        } else {
+          // Токен был обновлен
+          setToken(e.newValue);
+        }
+      }
+    };
+
+    // Периодически проверяем наличие токена в localStorage
+    // (на случай если токен был удален interceptor'ом в текущей вкладке)
+    const checkTokenInterval = setInterval(() => {
+      const currentToken = localStorage.getItem('authToken');
+      if (currentToken !== token) {
+        if (currentToken === null) {
+          setToken(null);
+          setUser(null);
+        } else {
+          setToken(currentToken);
+        }
+      }
+    }, 1000); // Проверяем каждую секунду
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(checkTokenInterval);
+    };
+  }, [token]);
 
   const login = async (email, password) => {
     setLoading(true);

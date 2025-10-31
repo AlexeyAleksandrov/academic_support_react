@@ -29,10 +29,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Токен истек или невалиден
+    // Обработка ошибок авторизации: 401 (Unauthorized) и 403 (Forbidden)
+    // 403 может возникать когда токен истек или невалиден
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Токен истек или невалиден - выполняем автоматический выход
       localStorage.removeItem('authToken');
-      window.location.href = '/login';
+      
+      // Перенаправляем на страницу входа только если мы не на публичных страницах
+      const publicPaths = ['/', '/login', '/register'];
+      const currentPath = window.location.pathname;
+      
+      if (!publicPaths.includes(currentPath)) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
