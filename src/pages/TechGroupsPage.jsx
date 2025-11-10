@@ -116,7 +116,7 @@ const TechGroupsPage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'add') {
-        await techGroupService.create(formData);
+        await techGroupService.create(formData.description);
         alert('Успешно добавлено');
       } else if (modalMode === 'edit') {
         await techGroupService.update(selectedItem.id, formData);
@@ -182,17 +182,19 @@ const TechGroupsPage = () => {
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="marketDemand">Востребованность:</label>
-          <input
-            type="number"
-            step="0.01"
-            id="marketDemand"
-            name="marketDemand"
-            value={formData.marketDemand !== undefined && formData.marketDemand !== null ? formData.marketDemand : '0'}
-            onChange={handleInputChange}
-          />
-        </div>
+        {modalMode === 'edit' && (
+          <div className="form-group">
+            <label htmlFor="marketDemand">Востребованность:</label>
+            <input
+              type="number"
+              step="0.01"
+              id="marketDemand"
+              name="marketDemand"
+              value={formData.marketDemand !== undefined && formData.marketDemand !== null ? formData.marketDemand : '0'}
+              onChange={handleInputChange}
+            />
+          </div>
+        )}
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">
             {modalMode === 'add' ? 'Добавить' : 'Сохранить'}

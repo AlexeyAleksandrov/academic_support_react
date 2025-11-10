@@ -76,6 +76,325 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Vacancy"
+  /api/vacancies:
+    get:
+      summary: "GET api/vacancies"
+      operationId: "getAllVacancies"
+      parameters:
+        - name: "offset"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: "0"
+        - name: "limit"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: "50"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/VacancyEntity"
+    post:
+      summary: "POST api/vacancies"
+      operationId: "createVacancy"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VacancyDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VacancyEntity"
+  /api/vacancies/cleanup-non-it:
+    post:
+      summary: "POST api/vacancies/cleanup-non-it"
+      operationId: "cleanupNonItVacancies"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /api/vacancies/count:
+    get:
+      summary: "GET api/vacancies/count"
+      operationId: "getVacanciesCount"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int64"
+  /api/vacancies/extract-skills-from-text:
+    post:
+      summary: "POST api/vacancies/extract-skills-from-text"
+      operationId: "extractSkillsFromText"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /api/vacancies/hh/{hhId}:
+    get:
+      summary: "GET api/vacancies/hh/{hhId}"
+      operationId: "getVacancyByHhId"
+      parameters:
+        - name: "hhId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VacancyEntity"
+  /api/vacancies/process-skills:
+    post:
+      summary: "POST api/vacancies/process-skills"
+      operationId: "processVacancySkills"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /api/vacancies/{id}:
+    get:
+      summary: "GET api/vacancies/{id}"
+      operationId: "getVacancyById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VacancyEntity"
+    put:
+      summary: "PUT api/vacancies/{id}"
+      operationId: "updateVacancy"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VacancyDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VacancyEntity"
+    delete:
+      summary: "DELETE api/vacancies/{id}"
+      operationId: "deleteVacancy"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /api/vacancies/{id}/skills:
+    get:
+      summary: "GET api/vacancies/{id}/skills"
+      operationId: "getVacancySkills"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkill"
+    post:
+      summary: "POST api/vacancies/{id}/skills"
+      operationId: "addSkillToVacancy"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SkillRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VacancyEntity"
+  /api/vacancies/{id}/skills/{skillId}:
+    delete:
+      summary: "DELETE api/vacancies/{id}/skills/{skillId}"
+      operationId: "removeSkillFromVacancy"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "skillId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VacancyEntity"
+  /api/expert-opinions:
+    get:
+      summary: "GET api/expert-opinions"
+      operationId: "getAllExpertOpinions"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ExpertOpinionResponseDto"
+    post:
+      summary: "POST api/expert-opinions"
+      operationId: "createExpertOpinion"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpertOpinionRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/expert-opinions/{id}:
+    get:
+      summary: "GET api/expert-opinions/{id}"
+      operationId: "getExpertOpinionById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    put:
+      summary: "PUT api/expert-opinions/{id}"
+      operationId: "updateExpertOpinion"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpertOpinionRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    delete:
+      summary: "DELETE api/expert-opinions/{id}"
+      operationId: "deleteExpertOpinion"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
   /api/saved-searches:
     get:
       summary: "GET api/saved-searches"
@@ -163,6 +482,151 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Void"
+  /api/competencies:
+    get:
+      summary: "GET api/competencies"
+      operationId: "getAllCompetencies"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/CompetencyDto"
+    post:
+      summary: "POST api/competencies"
+      operationId: "createCompetency"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompetencyRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompetencyDto"
+  /api/competencies/{id}:
+    get:
+      summary: "GET api/competencies/{id}"
+      operationId: "getCompetencyById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompetencyDto"
+    put:
+      summary: "PUT api/competencies/{id}"
+      operationId: "updateCompetency"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCompetencyRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompetencyDto"
+    delete:
+      summary: "DELETE api/competencies/{id}"
+      operationId: "deleteCompetency"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /api/competencies/{id}/keywords/generate:
+    post:
+      summary: "POST api/competencies/{id}/keywords/generate"
+      operationId: "generateKeywordsForCompetency"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "model"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "ollama"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/auth/login:
+    post:
+      summary: "POST api/auth/login"
+      operationId: "loginUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/auth/register:
+    post:
+      summary: "POST api/auth/register"
+      operationId: "registerUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
   /api/competencies/{competencyNumber}/indicators:
     get:
       summary: "GET api/competencies/{competencyNumber}/indicators"
@@ -355,117 +819,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IndicatorDto"
-  /api/competencies:
-    get:
-      summary: "GET api/competencies"
-      operationId: "getAllCompetencies"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/CompetencyDto"
-    post:
-      summary: "POST api/competencies"
-      operationId: "createCompetency"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateCompetencyRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CompetencyDto"
-  /api/competencies/{id}:
-    get:
-      summary: "GET api/competencies/{id}"
-      operationId: "getCompetencyById"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CompetencyDto"
-    put:
-      summary: "PUT api/competencies/{id}"
-      operationId: "updateCompetency"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateCompetencyRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CompetencyDto"
-    delete:
-      summary: "DELETE api/competencies/{id}"
-      operationId: "deleteCompetency"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /api/competencies/{id}/keywords/generate:
-    post:
-      summary: "POST api/competencies/{id}/keywords/generate"
-      operationId: "generateKeywordsForCompetency"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "model"
-          in: "query"
-          required: false
-          schema:
-            type: "string"
-            default: "ollama"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
   /api/rpd:
     get:
       summary: "GET api/rpd"
@@ -571,456 +924,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RpdDto"
-  /ask:
-    get:
-      summary: "GET ask"
-      operationId: "answer"
-      parameters:
-        - name: "text"
-          in: "query"
-          required: false
-          schema:
-            type: "string"
-            default: "Hi"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-  /api/keywords:
-    get:
-      summary: "GET api/keywords"
-      operationId: "getAllKeywords"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/KeywordDto"
-    post:
-      summary: "POST api/keywords"
-      operationId: "createKeyword"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateKeywordRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/KeywordDto"
-  /api/keywords/match/all:
-    post:
-      summary: "POST api/keywords/match/all"
-      operationId: "matchKeywordsToWorkSkills"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Keyword"
-  /api/keywords/{id}:
-    get:
-      summary: "GET api/keywords/{id}"
-      operationId: "getKeywordById"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/KeywordDto"
-    put:
-      summary: "PUT api/keywords/{id}"
-      operationId: "updateKeyword"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateKeywordRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/KeywordDto"
-    delete:
-      summary: "DELETE api/keywords/{id}"
-      operationId: "deleteKeyword"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /api/vacancies:
-    get:
-      summary: "GET api/vacancies"
-      operationId: "getAllVacancies"
-      parameters:
-        - name: "offset"
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
-            format: "int32"
-            default: "0"
-        - name: "limit"
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
-            format: "int32"
-            default: "50"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/VacancyEntity"
-    post:
-      summary: "POST api/vacancies"
-      operationId: "createVacancy"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/VacancyDto"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/VacancyEntity"
-  /api/vacancies/count:
-    get:
-      summary: "GET api/vacancies/count"
-      operationId: "getVacanciesCount"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "integer"
-                format: "int64"
-  /api/vacancies/hh/{hhId}:
-    get:
-      summary: "GET api/vacancies/hh/{hhId}"
-      operationId: "getVacancyByHhId"
-      parameters:
-        - name: "hhId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/VacancyEntity"
-  /api/vacancies/{id}:
-    get:
-      summary: "GET api/vacancies/{id}"
-      operationId: "getVacancyById"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/VacancyEntity"
-    put:
-      summary: "PUT api/vacancies/{id}"
-      operationId: "updateVacancy"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/VacancyDto"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/VacancyEntity"
-    delete:
-      summary: "DELETE api/vacancies/{id}"
-      operationId: "deleteVacancy"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /api/vacancies/{id}/skills:
-    get:
-      summary: "GET api/vacancies/{id}/skills"
-      operationId: "getVacancySkills"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkSkill"
-    post:
-      summary: "POST api/vacancies/{id}/skills"
-      operationId: "addSkillToVacancy"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SkillRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/VacancyEntity"
-  /api/vacancies/{id}/skills/{skillId}:
-    delete:
-      summary: "DELETE api/vacancies/{id}/skills/{skillId}"
-      operationId: "removeSkillFromVacancy"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "skillId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/VacancyEntity"
-  /api/skills-groups:
-    get:
-      summary: "GET api/skills-groups"
-      operationId: "getAllSkillsGroups"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/SkillsGroup"
-    post:
-      summary: "POST api/skills-groups"
-      operationId: "createSkillsGroup"
-      parameters:
-        - name: "name"
-          in: "query"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SkillsGroup"
-  /api/skills-groups/match-to-work-skills:
-    post:
-      summary: "POST api/skills-groups/match-to-work-skills"
-      operationId: "matchSkillsToGroups"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkSkill"
-  /api/skills-groups/update-market-demand:
-    put:
-      summary: "PUT api/skills-groups/update-market-demand"
-      operationId: "updateSkillsGroupsMarketDemand"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/SkillsGroup"
-  /api/skills-groups/{id}:
-    get:
-      summary: "GET api/skills-groups/{id}"
-      operationId: "getSkillsGroupById"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SkillsGroup"
-    put:
-      summary: "PUT api/skills-groups/{id}"
-      operationId: "updateSkillsGroup"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SkillsGroup"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SkillsGroup"
-    delete:
-      summary: "DELETE api/skills-groups/{id}"
-      operationId: "deleteSkillsGroup"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /api/skills-groups/{id}/work-skills:
-    get:
-      summary: "GET api/skills-groups/{id}/work-skills"
-      operationId: "getWorkSkillsBySkillsGroupId"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkSkill"
   /api/experts:
     get:
       summary: "GET api/experts"
@@ -1108,217 +1011,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Void"
-  /api/expert-opinions:
-    get:
-      summary: "GET api/expert-opinions"
-      operationId: "getAllExpertOpinions"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ExpertOpinionResponseDto"
-    post:
-      summary: "POST api/expert-opinions"
-      operationId: "createExpertOpinion"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ExpertOpinionRequestDto"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-  /api/expert-opinions/{id}:
-    get:
-      summary: "GET api/expert-opinions/{id}"
-      operationId: "getExpertOpinionById"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-    put:
-      summary: "PUT api/expert-opinions/{id}"
-      operationId: "updateExpertOpinion"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ExpertOpinionRequestDto"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-    delete:
-      summary: "DELETE api/expert-opinions/{id}"
-      operationId: "deleteExpertOpinion"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-  /api/work-skills:
-    get:
-      summary: "GET api/work-skills"
-      operationId: "getAllWorkSkills"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkSkillResponseDto"
-    post:
-      summary: "POST api/work-skills"
-      operationId: "createWorkSkill"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WorkSkillDto"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WorkSkillResponseDto"
-  /api/work-skills/match-to-groups:
-    post:
-      summary: "POST api/work-skills/match-to-groups"
-      operationId: "matchSkillsToGroups"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkSkillResponseDto"
-  /api/work-skills/{id}:
-    get:
-      summary: "GET api/work-skills/{id}"
-      operationId: "getWorkSkillById"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WorkSkillResponseDto"
-    put:
-      summary: "PUT api/work-skills/{id}"
-      operationId: "updateWorkSkill"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WorkSkillDto"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WorkSkillResponseDto"
-    delete:
-      summary: "DELETE api/work-skills/{id}"
-      operationId: "deleteWorkSkill"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WorkSkillResponseDto"
-  /api/work-skills/{workSkillId}/skills-group/{skillsGroupId}:
-    put:
-      summary: "PUT api/work-skills/{workSkillId}/skills-group/{skillsGroupId}"
-      operationId: "updateSkillsGroupForWorkSkill"
-      parameters:
-        - name: "workSkillId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "skillsGroupId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WorkSkillResponseDto"
   /api/foresights:
     get:
       summary: "GET api/foresights"
@@ -1553,6 +1245,388 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RpdSkillResponseDto"
+  /api/skills-groups:
+    get:
+      summary: "GET api/skills-groups"
+      operationId: "getAllSkillsGroups"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SkillsGroup"
+    post:
+      summary: "POST api/skills-groups"
+      operationId: "createSkillsGroup"
+      parameters:
+        - name: "name"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SkillsGroup"
+  /api/skills-groups/match-to-work-skills:
+    post:
+      summary: "POST api/skills-groups/match-to-work-skills"
+      operationId: "matchSkillsToGroups"
+      parameters:
+        - name: "llmProvider"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "gigachat"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkill"
+  /api/skills-groups/update-market-demand:
+    put:
+      summary: "PUT api/skills-groups/update-market-demand"
+      operationId: "updateSkillsGroupsMarketDemand"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/SkillsGroup"
+  /api/skills-groups/{id}:
+    get:
+      summary: "GET api/skills-groups/{id}"
+      operationId: "getSkillsGroupById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SkillsGroup"
+    put:
+      summary: "PUT api/skills-groups/{id}"
+      operationId: "updateSkillsGroup"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SkillsGroup"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SkillsGroup"
+    delete:
+      summary: "DELETE api/skills-groups/{id}"
+      operationId: "deleteSkillsGroup"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /api/skills-groups/{id}/work-skills:
+    get:
+      summary: "GET api/skills-groups/{id}/work-skills"
+      operationId: "getWorkSkillsBySkillsGroupId"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkill"
+  /api/keywords:
+    get:
+      summary: "GET api/keywords"
+      operationId: "getAllKeywords"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/KeywordDto"
+    post:
+      summary: "POST api/keywords"
+      operationId: "createKeyword"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateKeywordRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KeywordDto"
+  /api/keywords/match/all:
+    post:
+      summary: "POST api/keywords/match/all"
+      operationId: "matchKeywordsToWorkSkills"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Keyword"
+  /api/keywords/{id}:
+    get:
+      summary: "GET api/keywords/{id}"
+      operationId: "getKeywordById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KeywordDto"
+    put:
+      summary: "PUT api/keywords/{id}"
+      operationId: "updateKeyword"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateKeywordRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KeywordDto"
+    delete:
+      summary: "DELETE api/keywords/{id}"
+      operationId: "deleteKeyword"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /api/work-skills:
+    get:
+      summary: "GET api/work-skills"
+      operationId: "getAllWorkSkills"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkillResponseDto"
+    post:
+      summary: "POST api/work-skills"
+      operationId: "createWorkSkill"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkSkillDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkSkillResponseDto"
+  /api/work-skills/cleanup-unused:
+    delete:
+      summary: "DELETE api/work-skills/cleanup-unused"
+      operationId: "deleteUnusedWorkSkills"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /api/work-skills/match-to-groups:
+    post:
+      summary: "POST api/work-skills/match-to-groups"
+      operationId: "matchSkillsToGroups"
+      parameters:
+        - name: "llmProvider"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "gigachat"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkSkillResponseDto"
+  /api/work-skills/{id}:
+    get:
+      summary: "GET api/work-skills/{id}"
+      operationId: "getWorkSkillById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkSkillResponseDto"
+    put:
+      summary: "PUT api/work-skills/{id}"
+      operationId: "updateWorkSkill"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkSkillDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkSkillResponseDto"
+    delete:
+      summary: "DELETE api/work-skills/{id}"
+      operationId: "deleteWorkSkill"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkSkillResponseDto"
+  /api/work-skills/{workSkillId}/skills-group/{skillsGroupId}:
+    put:
+      summary: "PUT api/work-skills/{workSkillId}/skills-group/{skillsGroupId}"
+      operationId: "updateSkillsGroupForWorkSkill"
+      parameters:
+        - name: "workSkillId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "skillsGroupId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkSkillResponseDto"
   /api/dst-aggregation/{workSkillId}:
     get:
       summary: "GET api/dst-aggregation/{workSkillId}"
@@ -1730,40 +1804,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IndicatorDto"
-  /api/auth/login:
-    post:
-      summary: "POST api/auth/login"
-      operationId: "loginUser"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LoginRequest"
-        required: true
+  /ask:
+    get:
+      summary: "GET ask"
+      operationId: "answer"
+      parameters:
+        - name: "text"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "Hi"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "object"
-  /api/auth/register:
-    post:
-      summary: "POST api/auth/register"
-      operationId: "registerUser"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RegisterRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
+                type: "string"
 components:
   schemas:
     SkillsGroup:
@@ -1856,6 +1914,80 @@ components:
           nullable: true
           items:
             type: "string"
+    VacancyDto:
+      type: "object"
+      properties:
+        hhId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        name:
+          type: "string"
+          nullable: true
+        publishedAt:
+          type: "string"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        skillIds:
+          type: "array"
+          nullable: true
+          items:
+            type: "integer"
+            format: "int64"
+    Void:
+      type: "object"
+      properties: { }
+    SkillRequest:
+      type: "object"
+      properties:
+        skillId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+    ExpertOpinionResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        expertId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        competencyAchievementIndicatorId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        workSkillId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        skillImportance:
+          type: "number"
+          format: "double"
+          nullable: true
+    ExpertOpinionRequestDto:
+      type: "object"
+      properties:
+        expertId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        competencyAchievementIndicatorId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        workSkillId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        skillImportance:
+          type: "number"
+          format: "double"
+          nullable: true
     SavedSearch:
       type: "object"
       properties:
@@ -1866,9 +1998,75 @@ components:
         searchQuery:
           type: "string"
           nullable: true
-    Void:
+    CompetencyDto:
       type: "object"
-      properties: { }
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        number:
+          type: "string"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        keywords:
+          type: "array"
+          nullable: true
+          items:
+            type: "string"
+    CreateCompetencyRequest:
+      type: "object"
+      properties:
+        number:
+          type: "string"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+    UpdateCompetencyRequest:
+      type: "object"
+      properties:
+        number:
+          type: "string"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        keywordIds:
+          type: "array"
+          nullable: true
+          items:
+            type: "integer"
+            format: "int64"
+    LoginRequest:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+          nullable: true
+        password:
+          type: "string"
+          nullable: true
+    RegisterRequest:
+      type: "object"
+      properties:
+        firstName:
+          type: "string"
+          nullable: true
+        lastName:
+          type: "string"
+          nullable: true
+        middleName:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+          nullable: true
+        password:
+          type: "string"
+          nullable: true
     IndicatorDto:
       type: "object"
       properties:
@@ -1936,48 +2134,6 @@ components:
         indicatorPossess:
           type: "string"
           nullable: true
-    CompetencyDto:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        number:
-          type: "string"
-          nullable: true
-        description:
-          type: "string"
-          nullable: true
-        keywords:
-          type: "array"
-          nullable: true
-          items:
-            type: "string"
-    CreateCompetencyRequest:
-      type: "object"
-      properties:
-        number:
-          type: "string"
-          nullable: true
-        description:
-          type: "string"
-          nullable: true
-    UpdateCompetencyRequest:
-      type: "object"
-      properties:
-        number:
-          type: "string"
-          nullable: true
-        description:
-          type: "string"
-          nullable: true
-        keywordIds:
-          type: "array"
-          nullable: true
-          items:
-            type: "integer"
-            format: "int64"
     Keyword:
       type: "object"
       properties:
@@ -2176,75 +2332,6 @@ components:
           nullable: true
           items:
             $ref: "#/components/schemas/RecommendedSkillDto"
-    KeywordDto:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        keyword:
-          type: "string"
-          nullable: true
-        workSkillIds:
-          type: "array"
-          nullable: true
-          items:
-            type: "integer"
-            format: "int64"
-    CreateKeywordRequest:
-      type: "object"
-      properties:
-        keyword:
-          type: "string"
-          nullable: true
-        workSkillIds:
-          type: "array"
-          nullable: true
-          items:
-            type: "integer"
-            format: "int64"
-    UpdateKeywordRequest:
-      type: "object"
-      properties:
-        keyword:
-          type: "string"
-          nullable: true
-        workSkillIds:
-          type: "array"
-          nullable: true
-          items:
-            type: "integer"
-            format: "int64"
-    VacancyDto:
-      type: "object"
-      properties:
-        hhId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        name:
-          type: "string"
-          nullable: true
-        publishedAt:
-          type: "string"
-          nullable: true
-        description:
-          type: "string"
-          nullable: true
-        skillIds:
-          type: "array"
-          nullable: true
-          items:
-            type: "integer"
-            format: "int64"
-    SkillRequest:
-      type: "object"
-      properties:
-        skillId:
-          type: "integer"
-          format: "int64"
-          nullable: true
     ExpertEntity:
       type: "object"
       properties:
@@ -2258,76 +2345,6 @@ components:
         trust:
           type: "number"
           format: "double"
-          nullable: true
-    ExpertOpinionResponseDto:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        expertId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        competencyAchievementIndicatorId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        workSkillId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        skillImportance:
-          type: "number"
-          format: "double"
-          nullable: true
-    ExpertOpinionRequestDto:
-      type: "object"
-      properties:
-        expertId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        competencyAchievementIndicatorId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        workSkillId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        skillImportance:
-          type: "number"
-          format: "double"
-          nullable: true
-    WorkSkillResponseDto:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-          nullable: true
-        description:
-          type: "string"
-          nullable: true
-        marketDemand:
-          type: "number"
-          format: "double"
-          nullable: true
-        skillsGroupId:
-          type: "integer"
-          format: "int64"
-          nullable: true
-    WorkSkillDto:
-      type: "object"
-      properties:
-        description:
-          type: "string"
-          nullable: true
-        skillsGroupId:
-          type: "integer"
-          format: "int64"
           nullable: true
     ForesightResponseDto:
       type: "object"
@@ -2393,6 +2410,74 @@ components:
           type: "integer"
           format: "int32"
           nullable: true
+    KeywordDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        keyword:
+          type: "string"
+          nullable: true
+        workSkillIds:
+          type: "array"
+          nullable: true
+          items:
+            type: "integer"
+            format: "int64"
+    CreateKeywordRequest:
+      type: "object"
+      properties:
+        keyword:
+          type: "string"
+          nullable: true
+        workSkillIds:
+          type: "array"
+          nullable: true
+          items:
+            type: "integer"
+            format: "int64"
+    UpdateKeywordRequest:
+      type: "object"
+      properties:
+        keyword:
+          type: "string"
+          nullable: true
+        workSkillIds:
+          type: "array"
+          nullable: true
+          items:
+            type: "integer"
+            format: "int64"
+    WorkSkillResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          nullable: true
+        description:
+          type: "string"
+          nullable: true
+        marketDemand:
+          type: "number"
+          format: "double"
+          nullable: true
+        skillsGroupId:
+          type: "integer"
+          format: "int64"
+          nullable: true
+    WorkSkillDto:
+      type: "object"
+      properties:
+        description:
+          type: "string"
+          nullable: true
+        skillsGroupId:
+          type: "integer"
+          format: "int64"
+          nullable: true
     DstAggregationResponseDto:
       type: "object"
       properties:
@@ -2411,31 +2496,4 @@ components:
         foresightPercentage:
           type: "number"
           format: "double"
-          nullable: true
-    LoginRequest:
-      type: "object"
-      properties:
-        email:
-          type: "string"
-          nullable: true
-        password:
-          type: "string"
-          nullable: true
-    RegisterRequest:
-      type: "object"
-      properties:
-        firstName:
-          type: "string"
-          nullable: true
-        lastName:
-          type: "string"
-          nullable: true
-        middleName:
-          type: "string"
-          nullable: true
-        email:
-          type: "string"
-          nullable: true
-        password:
-          type: "string"
           nullable: true
