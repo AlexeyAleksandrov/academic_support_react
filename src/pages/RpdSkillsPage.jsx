@@ -290,22 +290,21 @@ const RpdSkillsPage = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <button 
             className="btn btn-secondary" 
             onClick={() => navigate('/rpd')}
-            style={{ marginRight: '10px' }}
           >
             ← Назад к РПД
           </button>
-          <h2>
-            Управление навыками РПД
-            {rpdInfo && ` - ${rpdInfo.disciplineName} (${rpdInfo.year})`}
-          </h2>
+          <button className="btn btn-add" onClick={handleAdd}>
+            + Добавить
+          </button>
         </div>
-        <button className="btn btn-add" onClick={handleAdd}>
-          + Добавить
-        </button>
+        <h2>
+          Управление навыками РПД
+          {rpdInfo && ` - ${rpdInfo.disciplineName} (${rpdInfo.year})`}
+        </h2>
       </div>
 
       <DataTable
