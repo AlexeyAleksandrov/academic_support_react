@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import { foresightService, technologyService } from '../services/api';
+import { foresightService, foresightSkillsGroupService, technologyService, techGroupService } from '../services/api';
 import './PageStyles.css';
 
 const ForesightsPage = () => {
@@ -12,22 +12,33 @@ const ForesightsPage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({});
   const [allWorkSkills, setAllWorkSkills] = useState([]);
+  const [allSkillsGroups, setAllSkillsGroups] = useState([]);
+  const [activeTab, setActiveTab] = useState('skills'); // 'skills' или 'groups'
 
-  const columns = [
+  const getColumns = () => [
     { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
     { header: 'Источник', field: 'sourceName' },
-    { header: 'Навык', field: 'workSkillId', render: (row) => getWorkSkillName(row.workSkillId) },
+    { 
+      header: activeTab === 'skills' ? 'Навык' : 'Группа технологий', 
+      field: activeTab === 'skills' ? 'workSkillId' : 'skillsGroupId',
+      render: (row) => activeTab === 'skills' 
+        ? getWorkSkillName(row.workSkillId) 
+        : getSkillsGroupName(row.skillsGroupId)
+    },
   ];
 
   useEffect(() => {
     fetchAllWorkSkills();
+    fetchAllSkillsGroups();
     fetchData();
-  }, []);
+  }, [activeTab]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await foresightService.getAll();
+      const response = activeTab === 'skills' 
+        ? await foresightService.getAll() 
+        : await foresightSkillsGroupService.getAll();
       setData(response.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -47,15 +58,32 @@ const ForesightsPage = () => {
     }
   };
 
+  const fetchAllSkillsGroups = async () => {
+    try {
+      const response = await techGroupService.getAll();
+      setAllSkillsGroups(response.data || []);
+    } catch (error) {
+      console.error('Error fetching skills groups:', error);
+      alert('Ошибка при загрузке групп технологий');
+    }
+  };
+
   const getWorkSkillName = (workSkillId) => {
     const skill = allWorkSkills.find(s => s.id === workSkillId);
     return skill ? skill.description : `ID: ${workSkillId}`;
   };
 
+  const getSkillsGroupName = (skillsGroupId) => {
+    const group = allSkillsGroups.find(g => g.id === skillsGroupId);
+    return group ? group.description : `ID: ${skillsGroupId}`;
+  };
+
   const handleView = async (item) => {
     try {
       await fetchAllWorkSkills();
-      const response = await foresightService.getById(item.id);
+      await fetchAllSkillsGroups();
+      const service = activeTab === 'skills' ? foresightService : foresightSkillsGroupService;
+      const response = await service.getById(item.id);
       setSelectedItem(response.data);
       setModalMode('view');
       setModalOpen(true);
@@ -67,12 +95,21 @@ const ForesightsPage = () => {
 
   const handleEdit = async (item) => {
     setSelectedItem(item);
-    setFormData({
-      workSkillId: item.workSkillId || '',
-      sourceName: item.sourceName || '',
-      sourceUrl: item.sourceUrl || '',
-    });
+    if (activeTab === 'skills') {
+      setFormData({
+        workSkillId: item.workSkillId || '',
+        sourceName: item.sourceName || '',
+        sourceUrl: item.sourceUrl || '',
+      });
+    } else {
+      setFormData({
+        skillsGroupId: item.skillsGroupId || '',
+        sourceName: item.sourceName || '',
+        sourceUrl: item.sourceUrl || '',
+      });
+    }
     await fetchAllWorkSkills();
+    await fetchAllSkillsGroups();
     setModalMode('edit');
     setModalOpen(true);
   };
@@ -81,6 +118,7 @@ const ForesightsPage = () => {
     setSelectedItem(null);
     setFormData({});
     await fetchAllWorkSkills();
+    await fetchAllSkillsGroups();
     setModalMode('add');
     setModalOpen(true);
   };
@@ -88,7 +126,8 @@ const ForesightsPage = () => {
   const handleDelete = async (item) => {
     if (window.confirm(`Вы уверены, что хотите удалить прогноз из "${item.sourceName}"?`)) {
       try {
-        await foresightService.delete(item.id);
+        const service = activeTab === 'skills' ? foresightService : foresightSkillsGroupService;
+        await service.delete(item.id);
         alert('Успешно удалено');
         fetchData();
       } catch (error) {
@@ -102,17 +141,28 @@ const ForesightsPage = () => {
     e.preventDefault();
     
     try {
-      const submitData = {
-        workSkillId: parseInt(formData.workSkillId),
-        sourceName: formData.sourceName,
-        sourceUrl: formData.sourceUrl,
-      };
+      const service = activeTab === 'skills' ? foresightService : foresightSkillsGroupService;
+      let submitData;
+      
+      if (activeTab === 'skills') {
+        submitData = {
+          workSkillId: parseInt(formData.workSkillId),
+          sourceName: formData.sourceName,
+          sourceUrl: formData.sourceUrl,
+        };
+      } else {
+        submitData = {
+          skillsGroupId: parseInt(formData.skillsGroupId),
+          sourceName: formData.sourceName,
+          sourceUrl: formData.sourceUrl,
+        };
+      }
 
       if (modalMode === 'add') {
-        await foresightService.create(submitData);
+        await service.create(submitData);
         alert('Прогноз успешно создан');
       } else if (modalMode === 'edit') {
-        await foresightService.update(selectedItem.id, submitData);
+        await service.update(selectedItem.id, submitData);
         alert('Прогноз успешно обновлён');
       }
       setModalOpen(false);
@@ -140,8 +190,12 @@ const ForesightsPage = () => {
             <span>{selectedItem.id}</span>
           </div>
           <div className="view-field">
-            <strong>Навык:</strong>
-            <span>{getWorkSkillName(selectedItem.workSkillId)}</span>
+            <strong>{activeTab === 'skills' ? 'Навык:' : 'Группа технологий:'}</strong>
+            <span>
+              {activeTab === 'skills' 
+                ? getWorkSkillName(selectedItem.workSkillId) 
+                : getSkillsGroupName(selectedItem.skillsGroupId)}
+            </span>
           </div>
           <div className="view-field">
             <strong>Источник:</strong>
@@ -167,23 +221,40 @@ const ForesightsPage = () => {
       return (
         <form onSubmit={handleSubmit} className="edit-form">
           <div className="form-group">
-            <label htmlFor="workSkillId">
-              Навык: <span className="required">*</span>
+            <label htmlFor={activeTab === 'skills' ? 'workSkillId' : 'skillsGroupId'}>
+              {activeTab === 'skills' ? 'Навык:' : 'Группа технологий:'} <span className="required">*</span>
             </label>
-            <select
-              id="workSkillId"
-              name="workSkillId"
-              value={formData.workSkillId || ''}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Выберите навык</option>
-              {allWorkSkills.map(skill => (
-                <option key={skill.id} value={skill.id}>
-                  {skill.description}
-                </option>
-              ))}
-            </select>
+            {activeTab === 'skills' ? (
+              <select
+                id="workSkillId"
+                name="workSkillId"
+                value={formData.workSkillId || ''}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Выберите навык</option>
+                {allWorkSkills.map(skill => (
+                  <option key={skill.id} value={skill.id}>
+                    {skill.description}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <select
+                id="skillsGroupId"
+                name="skillsGroupId"
+                value={formData.skillsGroupId || ''}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Выберите группу технологий</option>
+                {allSkillsGroups.map(group => (
+                  <option key={group.id} value={group.id}>
+                    {group.description}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="form-group">
@@ -250,8 +321,42 @@ const ForesightsPage = () => {
         </button>
       </div>
 
+      <div className="tabs-container" style={{ marginBottom: '20px' }}>
+        <button 
+          className={`tab-button ${activeTab === 'skills' ? 'active' : ''}`}
+          onClick={() => setActiveTab('skills')}
+          style={{
+            padding: '10px 20px',
+            marginRight: '10px',
+            border: '1px solid #ddd',
+            backgroundColor: activeTab === 'skills' ? '#007bff' : '#fff',
+            color: activeTab === 'skills' ? '#fff' : '#333',
+            cursor: 'pointer',
+            borderRadius: '5px',
+            fontWeight: activeTab === 'skills' ? 'bold' : 'normal',
+          }}
+        >
+          Прогнозы навыков
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'groups' ? 'active' : ''}`}
+          onClick={() => setActiveTab('groups')}
+          style={{
+            padding: '10px 20px',
+            border: '1px solid #ddd',
+            backgroundColor: activeTab === 'groups' ? '#007bff' : '#fff',
+            color: activeTab === 'groups' ? '#fff' : '#333',
+            cursor: 'pointer',
+            borderRadius: '5px',
+            fontWeight: activeTab === 'groups' ? 'bold' : 'normal',
+          }}
+        >
+          Прогнозы групп технологий
+        </button>
+      </div>
+
       <DataTable
-        columns={columns}
+        columns={getColumns()}
         data={data}
         loading={loading}
         onView={handleView}
