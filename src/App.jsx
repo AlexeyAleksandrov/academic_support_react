@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import RPDPage from './pages/RPDPage.jsx';
 import RpdSkillsPage from './pages/RpdSkillsPage.jsx';
+import RpdSkillsGroupsPage from './pages/RpdSkillsGroupsPage.jsx';
 import CompetenciesPage from './pages/CompetenciesPage.jsx';
 import IndicatorsPage from './pages/IndicatorsPage.jsx';
 import TechnologiesPage from './pages/TechnologiesPage.jsx';
@@ -35,6 +36,7 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/rpd" element={<ProtectedRoute><RPDPage /></ProtectedRoute>} />
               <Route path="/rpd/:rpdId/skills" element={<ProtectedRoute><RpdSkillsPage /></ProtectedRoute>} />
+              <Route path="/rpd/:rpdId/skills-groups" element={<ProtectedRoute><RpdSkillsGroupsPage /></ProtectedRoute>} />
               <Route path="/competencies" element={<ProtectedRoute><CompetenciesPage /></ProtectedRoute>} />
               <Route path="/indicators" element={<ProtectedRoute><IndicatorsPage /></ProtectedRoute>} />
               <Route path="/technologies" element={<ProtectedRoute><TechnologiesPage /></ProtectedRoute>} />

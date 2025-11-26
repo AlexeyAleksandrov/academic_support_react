@@ -140,6 +140,10 @@ const RPDPage = () => {
     navigate(`/rpd/${item.id}/skills`);
   };
 
+  const handleManageSkillsGroups = (item) => {
+    navigate(`/rpd/${item.id}/skills-groups`);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -349,6 +353,12 @@ const RPDPage = () => {
             title: 'Управление навыками',
             onClick: handleManageSkills,
             className: 'manage-skills-btn'
+          },
+          {
+            icon: '📦',
+            title: 'Управление группами технологий',
+            onClick: handleManageSkillsGroups,
+            className: 'manage-skills-groups-btn'
           }
         ]}
         onView={handleView}

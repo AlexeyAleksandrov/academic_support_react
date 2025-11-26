@@ -186,7 +186,48 @@ export const rpdSkillService = {
 
 // DST Aggregation (DST Аггрегация)
 export const dstAggregationService = {
-  getByWorkSkillId: (workSkillId) => api.get(`/api/dst-aggregation/${workSkillId}`),
+  getByWorkSkillId: (workSkillId) => api.get(`/api/dst-aggregation/work-skill/${workSkillId}`),
+};
+
+// RPD Skills Groups (Группы технологий в РПД)
+export const rpdSkillsGroupService = {
+  getAll: () => api.get('/api/rpd-skills-groups'),
+  getById: (id) => api.get(`/api/rpd-skills-groups/${id}`),
+  getByRpdId: (rpdId) => api.get(`/api/rpd-skills-groups/rpd/${rpdId}`),
+  getBySkillsGroupId: (skillsGroupId) => api.get(`/api/rpd-skills-groups/skills-group/${skillsGroupId}`),
+  getByMinTime: (minTime) => api.get(`/api/rpd-skills-groups/time/${minTime}`),
+  create: (data) => api.post('/api/rpd-skills-groups', data),
+  update: (id, data) => api.put(`/api/rpd-skills-groups/${id}`, data),
+  delete: (id) => api.delete(`/api/rpd-skills-groups/${id}`),
+};
+
+// Expert Opinions Skills Groups (Экспертные оценки групп технологий)
+export const expertOpinionSkillsGroupService = {
+  getAll: () => api.get('/api/expert-opinions-skills-groups'),
+  getById: (id) => api.get(`/api/expert-opinions-skills-groups/${id}`),
+  getByExpertId: (expertId) => api.get(`/api/expert-opinions-skills-groups/expert/${expertId}`),
+  getByIndicatorId: (indicatorId) => api.get(`/api/expert-opinions-skills-groups/indicator/${indicatorId}`),
+  getBySkillsGroupId: (skillsGroupId) => api.get(`/api/expert-opinions-skills-groups/skills-group/${skillsGroupId}`),
+  getByMinImportance: (minImportance) => api.get(`/api/expert-opinions-skills-groups/importance/${minImportance}`),
+  create: (data) => api.post('/api/expert-opinions-skills-groups', data),
+  update: (id, data) => api.put(`/api/expert-opinions-skills-groups/${id}`, data),
+  delete: (id) => api.delete(`/api/expert-opinions-skills-groups/${id}`),
+};
+
+// Foresights Skills Groups (Прогнозы для групп технологий)
+export const foresightSkillsGroupService = {
+  getAll: () => api.get('/api/foresights-skills-groups'),
+  getById: (id) => api.get(`/api/foresights-skills-groups/${id}`),
+  getBySkillsGroupId: (skillsGroupId) => api.get(`/api/foresights-skills-groups/skills-group/${skillsGroupId}`),
+  getBySource: (sourceName) => api.get(`/api/foresights-skills-groups/source/${sourceName}`),
+  create: (data) => api.post('/api/foresights-skills-groups', data),
+  update: (id, data) => api.put(`/api/foresights-skills-groups/${id}`, data),
+  delete: (id) => api.delete(`/api/foresights-skills-groups/${id}`),
+};
+
+// DST Aggregation for Skills Groups (DST Аггрегация для групп технологий)
+export const dstAggregationSkillsGroupService = {
+  getBySkillsGroupId: (skillsGroupId) => api.get(`/api/dst-aggregation-skills-groups/skills-group/${skillsGroupId}`),
 };
 
 export default api;
