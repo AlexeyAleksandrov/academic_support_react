@@ -324,7 +324,7 @@ const RpdSkillsGroupsPage = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', width: '100%' }}>
           <button 
             className="btn btn-secondary" 
             onClick={() => navigate('/rpd')}
