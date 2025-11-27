@@ -145,6 +145,14 @@ const RpdSkillsGroupsPage = () => {
       const expertOpinions = expertOpinionsResponse.status === 'fulfilled' ? expertOpinionsResponse.value.data : [];
       const foresights = foresightsResponse.status === 'fulfilled' ? foresightsResponse.value.data : [];
       
+      // Отладочная информация
+      console.log('DST Aggregation Debug:');
+      console.log('Skills Group ID:', item.skillsGroupId);
+      console.log('Skills Group Data:', skillsGroupData);
+      console.log('Expert Opinions:', expertOpinions);
+      console.log('Foresights:', foresights);
+      console.log('Foresights Response:', foresightsResponse);
+      
       // Вычисление процента часов в РПД
       const totalTime = data.reduce((sum, d) => sum + (d.time || 0), 0);
       const rpdCoveragePercentage = totalTime > 0 ? (item.time / totalTime) * 100 : 0;
@@ -157,10 +165,11 @@ const RpdSkillsGroupsPage = () => {
         ? (expertOpinions.reduce((sum, eo) => sum + (eo.importance || 0), 0) / expertOpinions.length) * 100 
         : 0;
       
-      // Процент прогнозов (считаем долю позитивных прогнозов)
-      const foresightPercentage = foresights.length > 0 
-        ? (foresights.filter(f => f.trend === 'RISING' || f.trend === 'STABLE').length / foresights.length) * 100 
-        : 0;
+      // Процент прогнозов - упрощенная логика: если есть прогнозы - 100%, если нет - 0%
+      // Позже можно усложнить на основе тренда, если такое поле будет доступно
+      const foresightPercentage = foresights.length > 0 ? 100 : 0;
+      
+      console.log('Calculated foresightPercentage:', foresightPercentage);
       
       setDstData({
         rpdCoveragePercentage,
