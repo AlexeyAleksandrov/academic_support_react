@@ -19,7 +19,13 @@ const RpdSkillsGroupsPage = () => {
   const [dstModalOpen, setDstModalOpen] = useState(false);
   const [dstData, setDstData] = useState(null);
   const [loadingDst, setLoadingDst] = useState(false);
-
+  const [dstResults, setDstResults] = useState(null);
+  
+  // Коэффициенты для DST расчетов
+  const [kMarket, setKMarket] = useState(0.8);
+  const [kExpert, setKExpert] = useState(0.9);
+  const [kForecast, setKForecast] = useState(0.6);
+  
   const columns = [
     { header: '№', field: 'rowNumber', render: (row, index) => index + 1 },
     { 
@@ -171,6 +177,25 @@ const RpdSkillsGroupsPage = () => {
       
       console.log('Calculated foresightPercentage:', foresightPercentage);
       
+      // Вычисляем DST на основе полученных данных
+      // Преобразуем проценты в доли (0-1) для расчетов
+      const marketValueFraction = marketDemand / 100;
+      const expertValueFraction = expertOpinionPercentage / 100;
+      const forecastValueFraction = foresightPercentage / 100;
+      
+      // Выполняем расчет DST
+      const dstResult = calculateFullDST(
+        marketValueFraction,
+        expertValueFraction,
+        forecastValueFraction,
+        kMarket,
+        kExpert,
+        kForecast
+      );
+      
+      console.log('DST Full Result (with intermediate):', dstResult);
+      setDstResults(dstResult); // Сохраняем весь объект с промежуточными значениями
+      
       const dstDataToSet = {
         rpdCoveragePercentage,
         marketDemand,
@@ -188,6 +213,85 @@ const RpdSkillsGroupsPage = () => {
     } finally {
       setLoadingDst(false);
     }
+  };
+
+  // ===== DST РАСЧЕТЫ =====
+  
+  /**
+   * Вычисляет функцию правдоподобия для одного источника данных
+   * @param {number} value - значение метрики (0-1, например 0.05 для 5%)
+   * @param {number} k - коэффициент уверенности в источнике (0-1)
+   * @returns {{mT: number, mU: number, mF: number}} - функция правдоподобия
+   */
+  const calculateSourceBelief = (value, k) => {
+    const mT = k * value;           // Уверенность во включении
+    const mU = 1 - k * value;       // Неопределенность
+    const mF = 0;                   // Уверенность в исключении (всегда 0 по условию)
+    return { mT, mU, mF };
+  };
+
+  /**
+   * Комбинирует две функции правдоподобия по формуле Демпстера-Шафера
+   * @param {{mT: number, mU: number, mF: number}} m1 - первая функция
+   * @param {{mT: number, mU: number, mF: number}} m2 - вторая функция
+   * @returns {{mT: number, mU: number, mF: number}} - комбинированная функция
+   */
+  const combineDST = (m1, m2) => {
+    // Конфликт (всегда 0, так как mF = 0 для обоих источников)
+    const K = m1.mT * m2.mF + m1.mF * m2.mT;
+    const normFactor = 1 - K;
+    
+    // Комбинированные значения
+    const mT = (m1.mT * m2.mT + m1.mT * m2.mU + m1.mU * m2.mT) / normFactor;
+    const mU = (m1.mU * m2.mU) / normFactor;
+    const mF = 0; // По условию всегда 0
+    
+    return { mT, mU, mF };
+  };
+
+  /**
+   * Выполняет полный расчет DST для всех трех источников данных
+   * @param {number} marketValue - востребованность на рынке (0-1)
+   * @param {number} expertValue - оценка экспертов (0-1)
+   * @param {number} forecastValue - доля прогнозов (0-1)
+   * @param {number} kM - коэффициент для рынка
+   * @param {number} kE - коэффициент для экспертов
+   * @param {number} kF - коэффициент для прогнозов
+   * @returns {{final: {mT, mU, mF}, intermediate: {market, expert, forecast, step12}}} - итоговая и промежуточные функции правдоподобия
+   */
+  const calculateFullDST = (marketValue, expertValue, forecastValue, kM, kE, kF) => {
+    console.log('=== DST CALCULATION START ===');
+    console.log('Input values:', { marketValue, expertValue, forecastValue });
+    console.log('Coefficients:', { kM, kE, kF });
+    
+    // Вычисляем функции правдоподобия для каждого источника
+    const m_market = calculateSourceBelief(marketValue, kM);
+    console.log('m_market (Рынок):', m_market);
+    
+    const m_expert = calculateSourceBelief(expertValue, kE);
+    console.log('m_expert (Эксперты):', m_expert);
+    
+    const m_forecast = calculateSourceBelief(forecastValue, kF);
+    console.log('m_forecast (Прогнозы):', m_forecast);
+    
+    // Комбинируем последовательно: рынок + эксперты
+    const m_12 = combineDST(m_market, m_expert);
+    console.log('m_12 (Рынок + Эксперты):', m_12);
+    
+    // Результат + прогнозы
+    const m_final = combineDST(m_12, m_forecast);
+    console.log('m_final (Итог):', m_final);
+    console.log('=== DST CALCULATION END ===');
+    
+    return {
+      final: m_final,
+      intermediate: {
+        market: m_market,
+        expert: m_expert,
+        forecast: m_forecast,
+        step12: m_12
+      }
+    };
   };
 
   const handleSubmit = async (e) => {
@@ -310,13 +414,47 @@ const RpdSkillsGroupsPage = () => {
     }
 
     const formatDstPercent = (value) => {
-      console.log('Formatting DST percent, value:', value, 'formatted:', value === null || value === undefined ? 'Нет данных' : `${(value).toFixed(2)}%`);
       if (value === null || value === undefined) return 'Нет данных';
       return `${(value).toFixed(2)}%`;
     };
 
+    // Обработчик изменения коэффициентов k с пересчетом DST
+    const handleKChange = (e) => {
+      const { name, value } = e.target;
+      const numValue = parseFloat(value);
+      
+      // Обновляем коэффициент
+      if (name === 'kMarket') setKMarket(numValue);
+      if (name === 'kExpert') setKExpert(numValue);
+      if (name === 'kForecast') setKForecast(numValue);
+      
+      // Пересчитываем DST с новыми коэффициентами
+      const marketValueFraction = dstData.marketDemand / 100;
+      const expertValueFraction = dstData.expertOpinionPercentage / 100;
+      const forecastValueFraction = dstData.foresightPercentage / 100;
+      
+      const newKMarket = name === 'kMarket' ? numValue : kMarket;
+      const newKExpert = name === 'kExpert' ? numValue : kExpert;
+      const newKForecast = name === 'kForecast' ? numValue : kForecast;
+      
+      const dstResult = calculateFullDST(
+        marketValueFraction,
+        expertValueFraction,
+        forecastValueFraction,
+        newKMarket,
+        newKExpert,
+        newKForecast
+      );
+      
+      setDstResults(dstResult); // Сохраняем весь объект с промежуточными значениями
+    };
+
     return (
       <div className="view-content">
+        <h3 style={{ marginBottom: '15px', borderBottom: '2px solid #007bff', paddingBottom: '10px' }}>
+          Исходные данные
+        </h3>
+        
         <div className="view-field">
           <label>Процент часов в РПД:</label>
           <span>{formatDstPercent(dstData.rpdCoveragePercentage)}</span>
@@ -333,6 +471,188 @@ const RpdSkillsGroupsPage = () => {
           <label>Доля прогнозов:</label>
           <span>{formatDstPercent(dstData.foresightPercentage)}</span>
         </div>
+
+        <h3 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '2px solid #28a745', paddingBottom: '10px' }}>
+          Коэффициенты уверенности в источниках (k)
+        </h3>
+        
+        <div className="form-group">
+          <label htmlFor="kMarket">k_рынок (надежность данных рынка):</label>
+          <input
+            type="number"
+            id="kMarket"
+            name="kMarket"
+            value={kMarket}
+            onChange={handleKChange}
+            step="0.1"
+            min="0"
+            max="1"
+            style={{ width: '100px' }}
+          />
+          <span style={{ marginLeft: '10px', color: '#666' }}>
+            (текущее: {kMarket})
+          </span>
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="kExpert">k_эксперт (надежность мнений экспертов):</label>
+          <input
+            type="number"
+            id="kExpert"
+            name="kExpert"
+            value={kExpert}
+            onChange={handleKChange}
+            step="0.1"
+            min="0"
+            max="1"
+            style={{ width: '100px' }}
+          />
+          <span style={{ marginLeft: '10px', color: '#666' }}>
+            (текущее: {kExpert})
+          </span>
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="kForecast">k_прогноз (надежность прогнозов):</label>
+          <input
+            type="number"
+            id="kForecast"
+            name="kForecast"
+            value={kForecast}
+            onChange={handleKChange}
+            step="0.1"
+            min="0"
+            max="1"
+            style={{ width: '100px' }}
+          />
+          <span style={{ marginLeft: '10px', color: '#666' }}>
+            (текущее: {kForecast})
+          </span>
+        </div>
+
+        {dstResults && (
+          <>
+            <h3 style={{ marginTop: '20px', marginBottom: '15px', borderBottom: '2px solid #dc3545', paddingBottom: '10px' }}>
+              Результаты DST-анализа (Теория Демпстера-Шафера)
+            </h3>
+            
+            <div className="view-field" style={{ 
+              backgroundColor: '#d4edda', 
+              padding: '15px', 
+              borderRadius: '5px',
+              border: '2px solid #28a745',
+              marginBottom: '10px'
+            }}>
+              <label style={{ fontSize: '18px', fontWeight: 'bold', color: '#155724' }}>
+                ✓ Уверенность во включении:
+              </label>
+              <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745' }}>
+                {(dstResults.final.mT * 100).toFixed(2)}%
+              </span>
+            </div>
+            
+            <div className="view-field" style={{ 
+              backgroundColor: '#fff3cd', 
+              padding: '10px', 
+              borderRadius: '5px',
+              border: '1px solid #ffc107'
+            }}>
+              <label style={{ color: '#856404' }}>Неопределенность:</label>
+              <span style={{ fontWeight: 'bold', color: '#856404' }}>
+                {(dstResults.final.mU * 100).toFixed(2)}%
+              </span>
+            </div>
+            
+            <div className="view-field">
+              <label>Уверенность в исключении:</label>
+              <span>{(dstResults.final.mF * 100).toFixed(2)}%</span>
+            </div>
+            
+            {/* Детали расчета - промежуточные значения */}
+            <details style={{ 
+              marginTop: '15px', 
+              padding: '10px', 
+              backgroundColor: '#f8f9fa',
+              borderRadius: '5px',
+              border: '1px solid #dee2e6'
+            }}>
+              <summary style={{ 
+                cursor: 'pointer', 
+                fontWeight: 'bold',
+                color: '#495057',
+                padding: '5px'
+              }}>
+                📊 Детали расчета (промежуточные значения m_)
+              </summary>
+              
+              <div style={{ marginTop: '10px', fontSize: '14px' }}>
+                <h4 style={{ color: '#007bff', marginTop: '10px' }}>Шаг 1: Функции правдоподобия для каждого источника</h4>
+                
+                <div style={{ marginLeft: '10px', marginTop: '5px' }}>
+                  <strong>m_рынок (Востребованность на рынке):</strong>
+                  <ul style={{ marginLeft: '20px' }}>
+                    <li>m(T) = {dstResults.intermediate.market.mT.toFixed(4)} ({(dstResults.intermediate.market.mT * 100).toFixed(2)}%)</li>
+                    <li>m(U) = {dstResults.intermediate.market.mU.toFixed(4)} ({(dstResults.intermediate.market.mU * 100).toFixed(2)}%)</li>
+                    <li>m(F) = {dstResults.intermediate.market.mF.toFixed(4)} ({(dstResults.intermediate.market.mF * 100).toFixed(2)}%)</li>
+                  </ul>
+                </div>
+                
+                <div style={{ marginLeft: '10px', marginTop: '5px' }}>
+                  <strong>m_эксперт (Оценка экспертов):</strong>
+                  <ul style={{ marginLeft: '20px' }}>
+                    <li>m(T) = {dstResults.intermediate.expert.mT.toFixed(4)} ({(dstResults.intermediate.expert.mT * 100).toFixed(2)}%)</li>
+                    <li>m(U) = {dstResults.intermediate.expert.mU.toFixed(4)} ({(dstResults.intermediate.expert.mU * 100).toFixed(2)}%)</li>
+                    <li>m(F) = {dstResults.intermediate.expert.mF.toFixed(4)} ({(dstResults.intermediate.expert.mF * 100).toFixed(2)}%)</li>
+                  </ul>
+                </div>
+                
+                <div style={{ marginLeft: '10px', marginTop: '5px' }}>
+                  <strong>m_прогноз (Доля прогнозов):</strong>
+                  <ul style={{ marginLeft: '20px' }}>
+                    <li>m(T) = {dstResults.intermediate.forecast.mT.toFixed(4)} ({(dstResults.intermediate.forecast.mT * 100).toFixed(2)}%)</li>
+                    <li>m(U) = {dstResults.intermediate.forecast.mU.toFixed(4)} ({(dstResults.intermediate.forecast.mU * 100).toFixed(2)}%)</li>
+                    <li>m(F) = {dstResults.intermediate.forecast.mF.toFixed(4)} ({(dstResults.intermediate.forecast.mF * 100).toFixed(2)}%)</li>
+                  </ul>
+                </div>
+                
+                <h4 style={{ color: '#007bff', marginTop: '15px' }}>Шаг 2: Комбинирование m_рынок + m_эксперт = m₁₂</h4>
+                
+                <div style={{ marginLeft: '10px', marginTop: '5px' }}>
+                  <strong>m₁₂ (Рынок + Эксперты):</strong>
+                  <ul style={{ marginLeft: '20px' }}>
+                    <li>m(T) = {dstResults.intermediate.step12.mT.toFixed(4)} ({(dstResults.intermediate.step12.mT * 100).toFixed(2)}%)</li>
+                    <li>m(U) = {dstResults.intermediate.step12.mU.toFixed(4)} ({(dstResults.intermediate.step12.mU * 100).toFixed(2)}%)</li>
+                    <li>m(F) = {dstResults.intermediate.step12.mF.toFixed(4)} ({(dstResults.intermediate.step12.mF * 100).toFixed(2)}%)</li>
+                  </ul>
+                </div>
+                
+                <h4 style={{ color: '#007bff', marginTop: '15px' }}>Шаг 3: Комбинирование m₁₂ + m_прогноз = m_итог</h4>
+                
+                <div style={{ marginLeft: '10px', marginTop: '5px' }}>
+                  <strong>m_итог (Финальный результат):</strong>
+                  <ul style={{ marginLeft: '20px' }}>
+                    <li><strong style={{ color: '#28a745' }}>m(T) = {dstResults.final.mT.toFixed(4)} ({(dstResults.final.mT * 100).toFixed(2)}%)</strong> ← Уверенность во включении</li>
+                    <li>m(U) = {dstResults.final.mU.toFixed(4)} ({(dstResults.final.mU * 100).toFixed(2)}%) ← Неопределенность</li>
+                    <li>m(F) = {dstResults.final.mF.toFixed(4)} ({(dstResults.final.mF * 100).toFixed(2)}%) ← Уверенность в исключении</li>
+                  </ul>
+                </div>
+              </div>
+            </details>
+            
+            <div style={{ 
+              marginTop: '15px', 
+              padding: '10px', 
+              backgroundColor: '#f8f9fa',
+              borderRadius: '5px',
+              fontSize: '14px',
+              color: '#666'
+            }}>
+              <strong>Интерпретация:</strong> На основе анализа данных рынка, экспертных оценок и прогнозов, 
+              уверенность в необходимости включения этой технологии в программу составляет{' '}
+              <strong style={{ color: '#28a745' }}>{(dstResults.final.mT * 100).toFixed(2)}%</strong>.
+            </div>
+          </>
+        )}
       </div>
     );
   };
