@@ -29,7 +29,7 @@ const ExpertOpinionsPage = () => {
 
   const getColumns = () => [
     { header: 'Эксперт', field: 'expertId', render: (row) => expertsMap[row.expertId] || `ID: ${row.expertId}` },
-    { header: 'Индикатор', field: 'competencyAchievementIndicatorId', render: (row) => indicatorsMap[row.competencyAchievementIndicatorId]?.number || `ID: ${row.competencyAchievementIndicatorId}` },
+    { header: 'Индикатор', field: 'competencyAchievementIndicatorId', render: (row) => indicatorsMap[row.competencyAchievementIndicatorId] || `ID: ${row.competencyAchievementIndicatorId}` },
     { 
       header: activeTab === 'skills' ? 'Навык' : 'Группа технологий', 
       field: activeTab === 'skills' ? 'workSkillId' : 'skillsGroupId',
@@ -37,7 +37,11 @@ const ExpertOpinionsPage = () => {
         ? (skillsMap[row.workSkillId] || `ID: ${row.workSkillId}`)
         : (skillsGroupsMap[row.skillsGroupId] || `ID: ${row.skillsGroupId}`)
     },
-    { header: 'Важность', field: 'skillImportance', render: (row) => formatPercent(row.skillImportance) },
+    { 
+      header: 'Важность', 
+      field: activeTab === 'skills' ? 'skillImportance' : 'groupImportance',
+      render: (row) => formatPercent(activeTab === 'skills' ? row.skillImportance : row.groupImportance)
+    },
   ];
 
   useEffect(() => {
@@ -145,11 +149,12 @@ const ExpertOpinionsPage = () => {
         skillImportance: item.skillImportance ? (item.skillImportance * 100).toFixed(2) : '',
       });
     } else {
+      // Для групп технологий используется поле groupImportance
       setFormData({
         expertId: item.expertId || '',
         competencyAchievementIndicatorId: item.competencyAchievementIndicatorId || '',
         skillsGroupId: item.skillsGroupId || '',
-        skillImportance: item.skillImportance ? (item.skillImportance * 100).toFixed(2) : '',
+        skillImportance: item.groupImportance ? (item.groupImportance * 100).toFixed(2) : '',
       });
     }
     setModalMode('edit');
@@ -215,11 +220,12 @@ const ExpertOpinionsPage = () => {
           skillImportance: importanceValue,
         };
       } else {
+        // Для групп технологий используется поле groupImportance
         payload = {
           expertId: parseInt(formData.expertId),
           competencyAchievementIndicatorId: parseInt(formData.competencyAchievementIndicatorId),
           skillsGroupId: parseInt(formData.skillsGroupId),
-          skillImportance: importanceValue,
+          groupImportance: importanceValue,
         };
       }
       
@@ -261,7 +267,7 @@ const ExpertOpinionsPage = () => {
           </div>
           <div className="view-field">
             <label>Индикатор:</label>
-            <span>{indicatorsMap[selectedItem?.competencyAchievementIndicatorId]?.number}</span>
+            <span>{indicatorsMap[selectedItem?.competencyAchievementIndicatorId] || `ID: ${selectedItem?.competencyAchievementIndicatorId}`}</span>
           </div>
           <div className="view-field">
             <label>{activeTab === 'skills' ? 'Навык:' : 'Группа технологий:'}</label>
@@ -273,7 +279,11 @@ const ExpertOpinionsPage = () => {
           </div>
           <div className="view-field">
             <label>Важность:</label>
-            <span>{formatPercent(selectedItem?.skillImportance)}</span>
+            <span>
+              {activeTab === 'skills'
+                ? formatPercent(selectedItem?.skillImportance)
+                : formatPercent(selectedItem?.groupImportance)}
+            </span>
           </div>
         </div>
       );
