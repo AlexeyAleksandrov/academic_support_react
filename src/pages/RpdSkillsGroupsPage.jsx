@@ -162,7 +162,7 @@ const RpdSkillsGroupsPage = () => {
       
       // Средняя оценка экспертов
       const expertOpinionPercentage = expertOpinions.length > 0 
-        ? (expertOpinions.reduce((sum, eo) => sum + (eo.importance || 0), 0) / expertOpinions.length) * 100 
+        ? (expertOpinions.reduce((sum, eo) => sum + (eo.groupImportance || 0), 0) / expertOpinions.length) * 100 
         : 0;
       
       // Процент прогнозов - упрощенная логика: если есть прогнозы - 100%, если нет - 0%
