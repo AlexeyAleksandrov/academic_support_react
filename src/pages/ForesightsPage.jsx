@@ -28,6 +28,9 @@ const ForesightsPage = () => {
   ];
 
   useEffect(() => {
+    // Очищаем данные и показываем индикатор загрузки сразу при переключении вкладок
+    setData([]);
+    setLoading(true);
     fetchAllWorkSkills();
     fetchAllSkillsGroups();
     fetchData();
@@ -35,7 +38,6 @@ const ForesightsPage = () => {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const response = activeTab === 'skills' 
         ? await foresightService.getAll() 
         : await foresightSkillsGroupService.getAll();

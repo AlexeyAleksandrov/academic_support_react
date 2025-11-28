@@ -74,11 +74,12 @@ export const competencyService = {
 
 // Indicators (Индикаторы)
 export const indicatorService = {
+  getAll: () => api.get('/api/indicators'),
   getByCompetency: (competencyNumber) => api.get(`/api/competencies/${competencyNumber}/indicators`),
-  getByNumber: (competencyNumber, number) => api.get(`/api/competencies/${competencyNumber}/indicators/number/${number}`),
+  getByNumber: (competencyNumber, number) => api.get(`/api/competencies/${competencyNumber}/indicators/${number}`),
   create: (competencyNumber, data) => api.post(`/api/competencies/${competencyNumber}/indicators`, data),
-  update: (competencyNumber, number, data) => api.put(`/api/competencies/${competencyNumber}/indicators/number/${number}`, data),
-  delete: (competencyNumber, number) => api.delete(`/api/competencies/${competencyNumber}/indicators/number/${number}`),
+  update: (competencyNumber, number, data) => api.put(`/api/competencies/${competencyNumber}/indicators/${number}`, data),
+  delete: (competencyNumber, number) => api.delete(`/api/competencies/${competencyNumber}/indicators/${number}`),
 };
 
 // Technologies / Work Skills (Технологии)
