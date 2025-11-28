@@ -294,6 +294,79 @@ const RpdSkillsGroupsPage = () => {
     };
   };
 
+  /**
+   * Определяет рекомендацию на основе результатов DST-анализа
+   * @param {number} mT - Уверенность во включении (0-1)
+   * @param {number} mU - Неопределенность (0-1)
+   * @param {number} mF - Уверенность в исключении (0-1)
+   * @returns {{text: string, level: string, color: string, backgroundColor: string}} - рекомендация с визуальными параметрами
+   */
+  const getDSTRecommendation = (mT, mU, mF) => {
+    // ПРАВИЛО 5: СИЛЬНАЯ РЕКОМЕНДАЦИЯ ИСКЛЮЧИТЬ (проверяем первым как самое критичное)
+    if (mF > 0.8 && mT < 0.1 && mU < 0.2) {
+      return {
+        text: "Исключить из программы",
+        level: "danger",
+        color: "#721c24",
+        backgroundColor: "#f8d7da",
+        border: "2px solid #f5c6cb"
+      };
+    }
+    
+    // ПРАВИЛО 4: РЕКОМЕНДАЦИЯ УМЕНЬШИТЬ
+    if (mF > 0.6 && mT < 0.3) {
+      return {
+        text: "Сократить часы на 50-70% или перенести в факультатив",
+        level: "warning",
+        color: "#856404",
+        backgroundColor: "#fff3cd",
+        border: "2px solid #ffc107"
+      };
+    }
+    
+    // ПРАВИЛО 3: КОНФЛИКТ - ТРЕБУЕТСЯ АНАЛИЗ
+    if (mU > 0.4 || (mT > 0.4 && mF > 0.4)) {
+      return {
+        text: "Требуется дополнительный анализ. Рассмотреть как опциональный модуль",
+        level: "info",
+        color: "#004085",
+        backgroundColor: "#d1ecf1",
+        border: "2px solid #bee5eb"
+      };
+    }
+    
+    // ПРАВИЛО 1: СИЛЬНАЯ РЕКОМЕНДАЦИЯ УВЕЛИЧИТЬ
+    if (mT > 0.8 && mF < 0.1) {
+      return {
+        text: "Значительно увеличить часы (50-100%)",
+        level: "success-strong",
+        color: "#155724",
+        backgroundColor: "#d4edda",
+        border: "2px solid #28a745"
+      };
+    }
+    
+    // ПРАВИЛО 2: СТАНДАРТНАЯ РЕКОМЕНДАЦИЯ
+    if (mT > 0.6 && mF < 0.3) {
+      return {
+        text: "Сохранить текущее количество часов",
+        level: "success",
+        color: "#0c5460",
+        backgroundColor: "#d1ecf1",
+        border: "2px solid #17a2b8"
+      };
+    }
+    
+    // Если ни одно правило не сработало - общая рекомендация
+    return {
+      text: "Результаты неоднозначны. Рекомендуется дополнительная экспертная оценка",
+      level: "secondary",
+      color: "#383d41",
+      backgroundColor: "#e2e3e5",
+      border: "2px solid #d6d8db"
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -651,6 +724,45 @@ const RpdSkillsGroupsPage = () => {
               уверенность в необходимости включения этой технологии в программу составляет{' '}
               <strong style={{ color: '#28a745' }}>{(dstResults.final.mT * 100).toFixed(2)}%</strong>.
             </div>
+            
+            {/* Рекомендация на основе триггеров */}
+            {(() => {
+              const recommendation = getDSTRecommendation(dstResults.final.mT, dstResults.final.mU, dstResults.final.mF);
+              return (
+                <div style={{ 
+                  marginTop: '20px', 
+                  padding: '15px', 
+                  backgroundColor: recommendation.backgroundColor,
+                  border: recommendation.border,
+                  borderRadius: '5px',
+                  fontSize: '16px',
+                  color: recommendation.color
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '24px', marginRight: '10px' }}>
+                      {recommendation.level === 'success-strong' && '🎯'}
+                      {recommendation.level === 'success' && '✅'}
+                      {recommendation.level === 'info' && '⚠️'}
+                      {recommendation.level === 'warning' && '⬇️'}
+                      {recommendation.level === 'danger' && '❌'}
+                      {recommendation.level === 'secondary' && '❓'}
+                    </span>
+                    <strong style={{ fontSize: '18px' }}>Автоматическая рекомендация</strong>
+                  </div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '5px' }}>
+                    {recommendation.text}
+                  </div>
+                  <div style={{ 
+                    marginTop: '10px', 
+                    fontSize: '13px', 
+                    fontStyle: 'italic',
+                    opacity: 0.8
+                  }}>
+                    Рекомендация основана на правилах принятия решений DST-методологии
+                  </div>
+                </div>
+              );
+            })()}
           </>
         )}
       </div>
