@@ -111,7 +111,7 @@ const ExpertOpinionsPage = () => {
       setIndicators(inds);
       const map = {};
       inds.forEach(ind => {
-        map[ind.id] = ind;
+        map[ind.id] = ind.number;
       });
       setIndicatorsMap(map);
     } catch (error) {
