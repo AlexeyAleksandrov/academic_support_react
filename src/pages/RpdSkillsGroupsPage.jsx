@@ -171,12 +171,16 @@ const RpdSkillsGroupsPage = () => {
       
       console.log('Calculated foresightPercentage:', foresightPercentage);
       
-      setDstData({
+      const dstDataToSet = {
         rpdCoveragePercentage,
         marketDemand,
         expertOpinionPercentage,
         foresightPercentage,
-      });
+      };
+      
+      console.log('DST Data to set:', dstDataToSet);
+      
+      setDstData(dstDataToSet);
     } catch (error) {
       console.error('Error fetching DST aggregation:', error);
       alert('Ошибка при загрузке DST-аггрегации: ' + (error.response?.data?.message || error.message));
@@ -295,6 +299,8 @@ const RpdSkillsGroupsPage = () => {
   };
 
   const renderDstModalContent = () => {
+    console.log('Rendering DST Modal with dstData:', dstData);
+    
     if (loadingDst) {
       return <div className="loading">Загрузка DST-аггрегации...</div>;
     }
@@ -304,6 +310,7 @@ const RpdSkillsGroupsPage = () => {
     }
 
     const formatDstPercent = (value) => {
+      console.log('Formatting DST percent, value:', value, 'formatted:', value === null || value === undefined ? 'Нет данных' : `${(value).toFixed(2)}%`);
       if (value === null || value === undefined) return 'Нет данных';
       return `${(value).toFixed(2)}%`;
     };

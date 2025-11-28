@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import { expertOpinionService, expertService, technologyService } from '../services/api';
+import { expertOpinionService, expertOpinionSkillsGroupService, expertService, technologyService, techGroupService } from '../services/api';
 import './PageStyles.css';
 
 const ExpertOpinionsPage = () => {
@@ -15,6 +15,9 @@ const ExpertOpinionsPage = () => {
   const [workSkills, setWorkSkills] = useState([]);
   const [expertsMap, setExpertsMap] = useState({});
   const [skillsMap, setSkillsMap] = useState({});
+  const [activeTab, setActiveTab] = useState('skills'); // 'skills' или 'groups'
+  const [skillsGroups, setSkillsGroups] = useState([]);
+  const [skillsGroupsMap, setSkillsGroupsMap] = useState({});
 
   const formatPercent = (value) => {
     if (!value || value === 0) return '0%';
@@ -22,20 +25,27 @@ const ExpertOpinionsPage = () => {
     return percent.toFixed(2) + '%';
   };
 
-  const columns = [
+  const getColumns = () => [
     { header: 'Эксперт', field: 'expertId', render: (row) => expertsMap[row.expertId] || `ID: ${row.expertId}` },
     { header: 'Индикатор', field: 'competencyAchievementIndicatorId' },
-    { header: 'Навык', field: 'workSkillId', render: (row) => skillsMap[row.workSkillId] || `ID: ${row.workSkillId}` },
+    { 
+      header: activeTab === 'skills' ? 'Навык' : 'Группа технологий', 
+      field: activeTab === 'skills' ? 'workSkillId' : 'skillsGroupId',
+      render: (row) => activeTab === 'skills' 
+        ? (skillsMap[row.workSkillId] || `ID: ${row.workSkillId}`)
+        : (skillsGroupsMap[row.skillsGroupId] || `ID: ${row.skillsGroupId}`)
+    },
     { header: 'Важность', field: 'skillImportance', render: (row) => formatPercent(row.skillImportance) },
   ];
 
   useEffect(() => {
     fetchAllData();
-  }, []);
+  }, [activeTab]);
 
   const fetchAllData = async () => {
     await fetchExperts();
     await fetchWorkSkills();
+    await fetchSkillsGroups();
     await fetchData();
   };
 
@@ -69,10 +79,26 @@ const ExpertOpinionsPage = () => {
     }
   };
 
+  const fetchSkillsGroups = async () => {
+    try {
+      const response = await techGroupService.getAll();
+      const groups = response.data || [];
+      setSkillsGroups(groups);
+      const map = {};
+      groups.forEach(g => {
+        map[g.id] = g.description;
+      });
+      setSkillsGroupsMap(map);
+    } catch (error) {
+      console.error('Error fetching skills groups:', error);
+    }
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await expertOpinionService.getAll();
+      const service = activeTab === 'skills' ? expertOpinionService : expertOpinionSkillsGroupService;
+      const response = await service.getAll();
       setData(response.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -90,24 +116,42 @@ const ExpertOpinionsPage = () => {
 
   const handleEdit = (item) => {
     setSelectedItem(item);
-    setFormData({
-      expertId: item.expertId || '',
-      competencyAchievementIndicatorId: item.competencyAchievementIndicatorId || '',
-      workSkillId: item.workSkillId || '',
-      skillImportance: item.skillImportance ? (item.skillImportance * 100).toFixed(2) : '0',
-    });
+    if (activeTab === 'skills') {
+      setFormData({
+        expertId: item.expertId || '',
+        competencyAchievementIndicatorId: item.competencyAchievementIndicatorId || '',
+        workSkillId: item.workSkillId || '',
+        skillImportance: item.skillImportance ? (item.skillImportance * 100).toFixed(2) : '0',
+      });
+    } else {
+      setFormData({
+        expertId: item.expertId || '',
+        competencyAchievementIndicatorId: item.competencyAchievementIndicatorId || '',
+        skillsGroupId: item.skillsGroupId || '',
+        skillImportance: item.skillImportance ? (item.skillImportance * 100).toFixed(2) : '0',
+      });
+    }
     setModalMode('edit');
     setModalOpen(true);
   };
 
   const handleAdd = () => {
     setSelectedItem(null);
-    setFormData({
-      expertId: '',
-      competencyAchievementIndicatorId: '',
-      workSkillId: '',
-      skillImportance: '0',
-    });
+    if (activeTab === 'skills') {
+      setFormData({
+        expertId: '',
+        competencyAchievementIndicatorId: '',
+        workSkillId: '',
+        skillImportance: '0',
+      });
+    } else {
+      setFormData({
+        expertId: '',
+        competencyAchievementIndicatorId: '',
+        skillsGroupId: '',
+        skillImportance: '0',
+      });
+    }
     setModalMode('add');
     setModalOpen(true);
   };
@@ -115,7 +159,8 @@ const ExpertOpinionsPage = () => {
   const handleDelete = async (item) => {
     if (window.confirm('Вы уверены, что хотите удалить это мнение эксперта?')) {
       try {
-        await expertOpinionService.delete(item.id);
+        const service = activeTab === 'skills' ? expertOpinionService : expertOpinionSkillsGroupService;
+        await service.delete(item.id);
         alert('Успешно удалено');
         fetchData();
       } catch (error) {
@@ -128,18 +173,30 @@ const ExpertOpinionsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = {
-        expertId: parseInt(formData.expertId),
-        competencyAchievementIndicatorId: parseInt(formData.competencyAchievementIndicatorId),
-        workSkillId: parseInt(formData.workSkillId),
-        skillImportance: parseFloat(formData.skillImportance) / 100,
-      };
+      const service = activeTab === 'skills' ? expertOpinionService : expertOpinionSkillsGroupService;
+      let payload;
+      
+      if (activeTab === 'skills') {
+        payload = {
+          expertId: parseInt(formData.expertId),
+          competencyAchievementIndicatorId: parseInt(formData.competencyAchievementIndicatorId),
+          workSkillId: parseInt(formData.workSkillId),
+          skillImportance: parseFloat(formData.skillImportance) / 100,
+        };
+      } else {
+        payload = {
+          expertId: parseInt(formData.expertId),
+          competencyAchievementIndicatorId: parseInt(formData.competencyAchievementIndicatorId),
+          skillsGroupId: parseInt(formData.skillsGroupId),
+          skillImportance: parseFloat(formData.skillImportance) / 100,
+        };
+      }
       
       if (modalMode === 'add') {
-        await expertOpinionService.create(payload);
+        await service.create(payload);
         alert('Успешно добавлено');
       } else if (modalMode === 'edit') {
-        await expertOpinionService.update(selectedItem.id, payload);
+        await service.update(selectedItem.id, payload);
         alert('Успешно обновлено');
       }
       setModalOpen(false);
@@ -172,8 +229,12 @@ const ExpertOpinionsPage = () => {
             <span>{selectedItem?.competencyAchievementIndicatorId}</span>
           </div>
           <div className="view-field">
-            <label>Навык:</label>
-            <span>{skillsMap[selectedItem?.workSkillId] || `ID: ${selectedItem?.workSkillId}`}</span>
+            <label>{activeTab === 'skills' ? 'Навык:' : 'Группа технологий:'}</label>
+            <span>
+              {activeTab === 'skills'
+                ? (skillsMap[selectedItem?.workSkillId] || `ID: ${selectedItem?.workSkillId}`)
+                : (skillsGroupsMap[selectedItem?.skillsGroupId] || `ID: ${selectedItem?.skillsGroupId}`)}
+            </span>
           </div>
           <div className="view-field">
             <label>Важность:</label>
@@ -214,21 +275,40 @@ const ExpertOpinionsPage = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="workSkillId">Навык:</label>
-          <select
-            id="workSkillId"
-            name="workSkillId"
-            value={formData.workSkillId || ''}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="">Выберите навык</option>
-            {workSkills.map(skill => (
-              <option key={skill.id} value={skill.id}>
-                {skill.description}
-              </option>
-            ))}
-          </select>
+          <label htmlFor={activeTab === 'skills' ? 'workSkillId' : 'skillsGroupId'}>
+            {activeTab === 'skills' ? 'Навык:' : 'Группа технологий:'}
+          </label>
+          {activeTab === 'skills' ? (
+            <select
+              id="workSkillId"
+              name="workSkillId"
+              value={formData.workSkillId || ''}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Выберите навык</option>
+              {workSkills.map(skill => (
+                <option key={skill.id} value={skill.id}>
+                  {skill.description}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <select
+              id="skillsGroupId"
+              name="skillsGroupId"
+              value={formData.skillsGroupId || ''}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Выберите группу технологий</option>
+              {skillsGroups.map(group => (
+                <option key={group.id} value={group.id}>
+                  {group.description}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="skillImportance">Важность (%):</label>
@@ -265,8 +345,42 @@ const ExpertOpinionsPage = () => {
         </button>
       </div>
 
+      <div className="tabs-container" style={{ marginBottom: '20px' }}>
+        <button 
+          className={`tab-button ${activeTab === 'skills' ? 'active' : ''}`}
+          onClick={() => setActiveTab('skills')}
+          style={{
+            padding: '10px 20px',
+            marginRight: '10px',
+            border: '1px solid #ddd',
+            backgroundColor: activeTab === 'skills' ? '#007bff' : '#fff',
+            color: activeTab === 'skills' ? '#fff' : '#333',
+            cursor: 'pointer',
+            borderRadius: '5px',
+            fontWeight: activeTab === 'skills' ? 'bold' : 'normal',
+          }}
+        >
+          Мнения по навыкам
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'groups' ? 'active' : ''}`}
+          onClick={() => setActiveTab('groups')}
+          style={{
+            padding: '10px 20px',
+            border: '1px solid #ddd',
+            backgroundColor: activeTab === 'groups' ? '#007bff' : '#fff',
+            color: activeTab === 'groups' ? '#fff' : '#333',
+            cursor: 'pointer',
+            borderRadius: '5px',
+            fontWeight: activeTab === 'groups' ? 'bold' : 'normal',
+          }}
+        >
+          Мнения по группам технологий
+        </button>
+      </div>
+
       <DataTable
-        columns={columns}
+        columns={getColumns()}
         data={data}
         loading={loading}
         onView={handleView}
