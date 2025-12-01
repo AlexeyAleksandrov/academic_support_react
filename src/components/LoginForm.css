@@ -1,108 +1,277 @@
+/* ========================================
+   LoginForm Component - Material Design Style
+   ======================================== */
+
 .login-form-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 200px);
-  padding: 20px;
+  padding: var(--spacing-lg);
+  animation: fadeIn var(--transition-slow);
 }
 
+/* Material Design Card for Form */
 .login-form {
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: var(--bg-paper);
+  padding: var(--spacing-xxl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-3);
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
+  transition: box-shadow var(--transition-base);
 }
 
+.login-form:hover {
+  box-shadow: var(--shadow-4);
+}
+
+/* Form Title */
 .login-form h2 {
-  margin-top: 0;
-  margin-bottom: 30px;
+  margin: 0 0 var(--spacing-xl) 0;
   text-align: center;
-  color: #333;
-  font-size: 24px;
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0.005em;
 }
 
+/* Form Group - Material Design */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
+  position: relative;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
-  color: #555;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-secondary);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.875rem;
+  letter-spacing: 0.00714em;
+  transition: color var(--transition-fast);
 }
 
+/* Material Design Input */
 .form-group input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s;
+  padding: 12px 16px;
+  border: 1px solid var(--grey-400);
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background-color: transparent;
+  transition: all var(--transition-base);
   box-sizing: border-box;
+  outline: none;
+}
+
+.form-group input::placeholder {
+  color: var(--text-hint);
+  opacity: 0.6;
+}
+
+.form-group input:hover {
+  border-color: var(--grey-600);
 }
 
 .form-group input:focus {
-  outline: none;
-  border-color: #4CAF50;
+  border-color: var(--primary-color);
+  border-width: 2px;
+  padding: 11px 15px;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.12);
+}
+
+.form-group input:focus + label {
+  color: var(--primary-color);
 }
 
 .form-group input:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--grey-100);
+  color: var(--text-disabled);
+  border-style: dotted;
   cursor: not-allowed;
 }
 
+/* Error Message - Material Design */
 .error-message {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  border-left: 4px solid #c62828;
+  background-color: rgba(244, 67, 54, 0.08);
+  color: var(--error-dark);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.875rem;
+  border-left: 4px solid var(--error-color);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  line-height: 1.5;
 }
 
+.error-message::before {
+  content: '⚠';
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Submit Button - Material Design Raised Button */
 .submit-button {
   width: 100%;
-  padding: 12px;
-  background-color: #4CAF50;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #45a049;
+  box-shadow: var(--shadow-3);
+  transform: translateY(-2px);
+}
+
+.submit-button:active:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-2);
 }
 
 .submit-button:disabled {
-  background-color: #ccc;
+  background: var(--grey-400);
+  color: var(--text-disabled);
   cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
 }
 
+/* Form Footer */
 .form-footer {
-  margin-top: 20px;
+  margin-top: var(--spacing-lg);
   text-align: center;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--grey-300);
 }
 
 .form-footer p {
-  color: #666;
-  font-size: 14px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin: 0 0 var(--spacing-xs) 0;
 }
 
 .form-footer a {
-  color: #4CAF50;
+  color: var(--primary-color);
   text-decoration: none;
   font-weight: 500;
+  transition: color var(--transition-fast);
+  display: inline-block;
 }
 
 .form-footer a:hover {
+  color: var(--primary-dark);
   text-decoration: underline;
+}
+
+.form-footer a:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* Alternative Layout - Register Form */
+.register-form {
+  max-width: 480px;
+}
+
+/* Password Visibility Toggle */
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.password-toggle:hover {
+  color: var(--text-primary);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Responsive Design */
+@media (max-width: 599px) {
+  .login-form-container {
+    padding: var(--spacing-md);
+    min-height: calc(100vh - 150px);
+  }
+
+  .login-form {
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    max-width: 100%;
+  }
+
+  .login-form h2 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .form-group {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .submit-button {
+    padding: 12px 20px;
+    font-size: 0.8125rem;
+  }
+
+  .form-footer {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+  }
+
+  .form-footer p {
+    font-size: 0.8125rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
