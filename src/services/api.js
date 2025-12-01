@@ -1,8 +1,21 @@
 import axios from 'axios';
 
-// Use empty baseURL for proxy to work in development
-// In production, the built app will use the same origin
-const API_BASE_URL = '';
+// API Base URL Configuration
+// - В режиме разработки (npm run dev): используется пустой baseURL, 
+//   запросы идут через Vite proxy (настроен в vite.config.js)
+// - В production (Docker): используется пустой baseURL,
+//   запросы идут через nginx proxy на backend
+// - Можно переопределить через переменную окружения VITE_API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+// Отладочное логирование для проверки конфигурации
+console.log('🔧 API Configuration:', {
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  API_BASE_URL: API_BASE_URL,
+  MODE: import.meta.env.MODE,
+  DEV: import.meta.env.DEV,
+  PROD: import.meta.env.PROD
+});
 
 const api = axios.create({
   baseURL: API_BASE_URL,
