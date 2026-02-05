@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import Icon from '../components/Icon';
 import { techGroupService, expertOpinionSkillsGroupService, foresightSkillsGroupService } from '../services/api';
 import './PageStyles.css';
 
@@ -321,7 +322,7 @@ const TechGroupsPage = () => {
         loading={loading}
         customActions={[
           {
-            icon: '📈',
+            icon: <Icon name="chart" size={20} />,
             title: 'DST-аггрегация',
             onClick: handleShowDstAggregation,
             className: 'dst-aggregation-btn'

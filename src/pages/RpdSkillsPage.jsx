@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import Icon from '../components/Icon';
 import { rpdSkillService, technologyService, rpdService, dstAggregationService } from '../services/api';
 import './PageStyles.css';
 
@@ -313,7 +314,7 @@ const RpdSkillsPage = () => {
         loading={loading}
         customActions={[
           {
-            icon: '📈',
+            icon: <Icon name="chart" size={20} />,
             title: 'DST-аггрегация',
             onClick: handleShowDstAggregation,
             className: 'dst-aggregation-btn'

@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from './Icon';
 import './DataTable.css';
 
 const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customActions }) => {
@@ -52,21 +53,21 @@ const DataTable = ({ columns, data, onView, onEdit, onDelete, loading, customAct
                   onClick={() => onView(row)}
                   title="Просмотр"
                 >
-                  👁️
+                  <Icon name="view" size={20} />
                 </button>
                 <button
                   className="action-btn edit-btn"
                   onClick={() => onEdit(row)}
                   title="Редактировать"
                 >
-                  ✏️
+                  <Icon name="edit" size={20} />
                 </button>
                 <button
                   className="action-btn delete-btn"
                   onClick={() => onDelete(row)}
                   title="Удалить"
                 >
-                  🗑️
+                  <Icon name="delete" size={20} />
                 </button>
               </td>
             </tr>

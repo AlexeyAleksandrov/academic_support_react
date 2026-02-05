@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import Icon from '../components/Icon';
 import { rpdService, competencyService, indicatorService } from '../services/api';
 import './PageStyles.css';
 
@@ -349,13 +350,13 @@ const RPDPage = () => {
         loading={loading}
         customActions={[
           {
-            icon: '🎯',
+            icon: <Icon name="target" size={20} />,
             title: 'Управление навыками',
             onClick: handleManageSkills,
             className: 'manage-skills-btn'
           },
           {
-            icon: '📦',
+            icon: <Icon name="chart" size={20} />,
             title: 'Управление группами технологий',
             onClick: handleManageSkillsGroups,
             className: 'manage-skills-groups-btn'
